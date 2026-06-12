@@ -25,8 +25,6 @@ public interface ISnapshotStore
     void SetSnapshot(ClusterSnapshot snapshot);
 
     /// <summary>Records that the last refresh failed, leaving the existing snapshot in place.</summary>
-    /// <param name="error">The error message.</param>
-#pragma warning disable CA1716 // "error" is the clearest name here; the cross-language keyword clash is acceptable.
-    void SetError(string error);
-#pragma warning restore CA1716
+    /// <param name="message">The error message.</param>
+    void SetError(string message);
 }

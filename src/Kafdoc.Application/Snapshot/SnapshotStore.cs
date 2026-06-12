@@ -29,5 +29,5 @@ internal sealed class SnapshotStore : ISnapshotStore
     }
 
     /// <inheritdoc />
-    public void SetError(string error) => _lastError = error;
+    public void SetError(string message) => _lastError = message;
 }

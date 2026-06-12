@@ -42,14 +42,14 @@ internal sealed class UserQueryService(ISnapshotStore store) : IUserQueryService
         return new UserDetailDto(
             user.Principal,
             user.HasScramCredentials,
-            Topics(graph.Producers.Where(p => Eq(p.Principal, principal)).Select(p => p.Topic)),
-            Topics(graph.Consumers.Where(c => Eq(c.Principal, principal)).Select(c => c.Topic)),
-            Topics(graph.UserGroups.Where(g => Eq(g.Principal, principal)).Select(g => g.GroupId)));
+            DistinctSorted(graph.Producers.Where(p => Eq(p.Principal, principal)).Select(p => p.Topic)),
+            DistinctSorted(graph.Consumers.Where(c => Eq(c.Principal, principal)).Select(c => c.Topic)),
+            DistinctSorted(graph.UserGroups.Where(g => Eq(g.Principal, principal)).Select(g => g.GroupId)));
     }
 
     private static bool Eq(string a, string b) => string.Equals(a, b, StringComparison.Ordinal);
 
-    private static List<string> Topics(IEnumerable<string> source) =>
+    private static List<string> DistinctSorted(IEnumerable<string> source) =>
         source.Distinct(StringComparer.Ordinal).OrderBy(x => x, StringComparer.Ordinal).ToList();
 
     private static Dictionary<string, int> Counts(IEnumerable<(string Principal, string Topic)> edges) =>
