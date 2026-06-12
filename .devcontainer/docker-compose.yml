@@ -10,27 +10,30 @@ services:
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
-    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
+    # Runs the app on the same network as the Kafka container so the web app can
+    # reach the broker at localhost:9092 for local `dotnet run` smoke testing.
+    network_mode: service:kafka
 
     # Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     # user: root
 
-    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
-
-  db:
-    image: postgres:18.3
+  kafka:
+    image: apache/kafka:3.8.0
     restart: unless-stopped
-    volumes:
-      - postgres-data:/var/lib/postgresql/docker
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-
-    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
-
-volumes:
-  postgres-data:
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093"
+      KAFKA_LISTENERS: "SASL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "SASL://localhost:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "SASL:SASL_PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "SASL"
+      KAFKA_SASL_ENABLED_MECHANISMS: "SCRAM-SHA-512"
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: "SCRAM-SHA-512"
+      KAFKA_AUTHORIZER_CLASS_NAME: "org.apache.kafka.metadata.authorizer.StandardAuthorizer"
+      KAFKA_SUPER_USERS: "User:admin"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_LISTENER_NAME_SASL_SCRAM-SHA-512_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required;"
