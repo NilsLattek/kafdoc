@@ -27,24 +27,6 @@ dotnet test --no-restore --filter-class "*ChartAppServiceTests*"   # one class
 dotnet test --no-restore --filter-method "*CreateChartAsync_creates_chart_with_one_root_node*"   # one method
 ```
 
-### EF Core migrations
-
-Startup project is always `Kafdoc.Web`; migrations live in `Kafdoc.Infrastructure`.
-
-```bash
-# Create a new migration
-dotnet ef migrations add "Name" -o Data/Migrations \
-  --project src/Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj \
-  -s src/Kafdoc.Web/Kafdoc.Web.csproj
-
-# Apply pending migrations
-dotnet ef database update \
-  --project src/Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj \
-  -s src/Kafdoc.Web/Kafdoc.Web.csproj
-```
-
-The devcontainer provides Postgres 18 (`localhost:5432`, user/pass/db all `postgres`); the app container shares the db container's network.
-
 ## Code Style
 
 - General:

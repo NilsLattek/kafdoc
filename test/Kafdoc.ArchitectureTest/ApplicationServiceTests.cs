@@ -8,18 +8,17 @@ namespace Kafdoc.ArchitectureTest;
 
 /// <summary>
 /// Verifies that concrete application-service implementations are never public,
-/// keeping the public surface limited to the <c>IChartAppService</c> and
-/// <c>IOrgNodeAppService</c> interfaces.
+/// keeping the public surface limited to service interfaces.
 /// </summary>
 public class ApplicationServiceTests
 {
     [Fact]
-    public void App_service_implementations_are_not_public()
+    public void Service_implementations_are_not_public()
     {
         // Arrange
         IArchRule rule = Classes().That()
             .ResideInNamespace("Kafdoc.Application.Services")
-            .And().HaveNameEndingWith("AppService")
+            .And().HaveNameEndingWith("Service")
             .Should().NotBePublic();
 
         // Act + Assert

@@ -15,16 +15,16 @@ internal static class ArchitectureModel
         typeof(Kafdoc.Domain.Common.Dummy).Assembly;
 
     private static readonly System.Reflection.Assembly DomainAssembly =
-        typeof(Kafdoc.Domain.IRepository<>).Assembly;
+        typeof(Kafdoc.Domain.Kafka.IKafkaClusterReader).Assembly;
 
     private static readonly System.Reflection.Assembly ApplicationAssembly =
-        typeof(Kafdoc.Application.Services.ITopicAppService).Assembly;
+        typeof(Kafdoc.Application.Services.ITopicQueryService).Assembly;
 
     private static readonly System.Reflection.Assembly InfrastructureAssembly =
-        typeof(Kafdoc.Infrastructure.Dummy).Assembly;
+        typeof(Kafdoc.Infrastructure.ConfluentKafkaClusterReader).Assembly;
 
     private static readonly System.Reflection.Assembly WebAssembly =
-        typeof(Kafdoc.Web.Extensions.ServiceScopeExtensions).Assembly;
+        typeof(Program).Assembly;
 
     /// <summary>The loaded architecture spanning all five layers.</summary>
     public static readonly Architecture Architecture = new ArchLoader()

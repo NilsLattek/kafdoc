@@ -5,13 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="../Kafdoc.Application/Kafdoc.Application.csproj" />
     <ProjectReference Include="../Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj" />
   </ItemGroup>

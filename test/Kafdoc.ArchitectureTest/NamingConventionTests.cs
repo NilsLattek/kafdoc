@@ -12,18 +12,6 @@ namespace Kafdoc.ArchitectureTest;
 public class NamingConventionTests
 {
     [Fact]
-    public void Specifications_end_with_spec_suffix()
-    {
-        // Arrange
-        IArchRule rule = Classes().That()
-            .ResideInNamespace("Kafdoc.Domain.Specifications")
-            .Should().HaveNameEndingWith("Spec");
-
-        // Act + Assert
-        rule.Check(Architecture);
-    }
-
-    [Fact]
     public void Mappers_end_with_mapper_suffix()
     {
         // Arrange
