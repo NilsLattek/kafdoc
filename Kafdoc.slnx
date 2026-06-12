@@ -11,5 +11,6 @@
     <Project Path="test/Kafdoc.DomainTest/Kafdoc.DomainTest.csproj" />
     <Project Path="test/Kafdoc.WebTest/Kafdoc.WebTest.csproj" />
     <Project Path="test/Kafdoc.ArchitectureTest/Kafdoc.ArchitectureTest.csproj" />
+    <Project Path="test/Kafdoc.InfrastructureTest/Kafdoc.InfrastructureTest.csproj" />
   </Folder>
 </Solution>
