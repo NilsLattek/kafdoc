@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Kafdoc.Application/Kafdoc.Application.csproj" />
+    <Project Path="src/Kafdoc.Domain.Common/Kafdoc.Domain.Common.csproj" />
+    <Project Path="src/Kafdoc.Domain/Kafdoc.Domain.csproj" />
+    <Project Path="src/Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj" />
+    <Project Path="src/Kafdoc.Web/Kafdoc.Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Kafdoc.ApplicationTest/Kafdoc.ApplicationTest.csproj" />
+    <Project Path="test/Kafdoc.DomainTest/Kafdoc.DomainTest.csproj" />
+    <Project Path="test/Kafdoc.WebTest/Kafdoc.WebTest.csproj" />
+    <Project Path="test/Kafdoc.ArchitectureTest/Kafdoc.ArchitectureTest.csproj" />
+  </Folder>
+</Solution>
