@@ -15,6 +15,6 @@ public static class Configuration
     /// <param name="configuration">The application configuration.</param>
     public static void ConfigureDomain(this IServiceCollection services, IConfiguration configuration)
     {
-        // Graph builder is registered in Task 4.
+        services.AddSingleton<Kafdoc.Domain.Graph.ClusterGraphBuilder>();
     }
 }
