@@ -15,6 +15,17 @@ public static class Configuration
     /// <param name="configuration">The application configuration.</param>
     public static void ConfigureApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        // Snapshot, refresh, and query services are registered in Tasks 5 and 6.
+        services.AddOptions<Snapshot.RefreshOptions>()
+            .Bind(configuration.GetSection(Snapshot.RefreshOptions.SectionName));
+
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<Snapshot.ISnapshotStore, Snapshot.SnapshotStore>();
+        services.AddScoped<Snapshot.IClusterRefreshService, Snapshot.ClusterRefreshService>();
+
+        services.AddSingleton<Services.ITopicQueryService, Services.TopicQueryService>();
+        services.AddSingleton<Services.IUserQueryService, Services.UserQueryService>();
+        services.AddSingleton<Services.ISnapshotStatusService, Services.SnapshotStatusService>();
+
+        services.AddHostedService<Snapshot.ClusterRefreshHostedService>();
     }
 }
