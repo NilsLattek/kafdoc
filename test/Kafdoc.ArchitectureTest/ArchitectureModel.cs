@@ -21,7 +21,7 @@ internal static class ArchitectureModel
         typeof(Kafdoc.Application.Services.ITopicQueryService).Assembly;
 
     private static readonly System.Reflection.Assembly InfrastructureAssembly =
-        typeof(Kafdoc.Infrastructure.ConfluentKafkaClusterReader).Assembly;
+        typeof(Kafdoc.Infrastructure.Kafka.KafkaConnectionOptions).Assembly;
 
     private static readonly System.Reflection.Assembly WebAssembly =
         typeof(Program).Assembly;

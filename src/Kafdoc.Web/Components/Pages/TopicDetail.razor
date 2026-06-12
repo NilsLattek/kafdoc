@@ -1,0 +1,67 @@
+@page "/topics/{Name}"
+@rendermode InteractiveServer
+@using Kafdoc.Application.Services
+@inject ITopicQueryService TopicQuery
+
+<PageTitle>Topic: @Name</PageTitle>
+
+<p><a href="/">&larr; All topics</a></p>
+
+@{
+    var detail = TopicQuery.GetTopic(Name);
+}
+
+@if (detail is null)
+{
+    <h1>Topic not found</h1>
+    <p>No topic named <code>@Name</code> in the current snapshot.</p>
+}
+else
+{
+    <h1>@detail.Name</h1>
+    <p>@detail.PartitionCount partition(s)</p>
+
+    <h2>Producers</h2>
+    @if (detail.Producers.Count == 0)
+    {
+        <p><em>No producers (no WRITE ACLs).</em></p>
+    }
+    else
+    {
+        <ul>@foreach (var p in detail.Producers) { <li>@p</li> }</ul>
+    }
+
+    <h2>Consumer groups</h2>
+    @if (detail.ConsumerGroups.Count == 0)
+    {
+        <p><em>No consumer groups consuming this topic.</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead><tr><th>Group</th><th>State</th><th>Principals</th></tr></thead>
+            <tbody>
+                @foreach (var g in detail.ConsumerGroups)
+                {
+                    <tr>
+                        <td>@g.GroupId</td>
+                        <td>@g.State</td>
+                        <td>@(g.Principals.Count == 0 ? "—" : string.Join(", ", g.Principals))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (detail.ReadOnlyPrincipals.Count > 0)
+    {
+        <h2>Read-only principals (permitted, no active group)</h2>
+        <ul>@foreach (var p in detail.ReadOnlyPrincipals) { <li>@p</li> }</ul>
+    }
+}
+
+@code {
+    /// <summary>The topic name from the route.</summary>
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+}

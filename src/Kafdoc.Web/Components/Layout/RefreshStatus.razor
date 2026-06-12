@@ -1,0 +1,47 @@
+@rendermode InteractiveServer
+@using Kafdoc.Application.Services
+@using Kafdoc.Application.Snapshot
+@inject ISnapshotStatusService Status
+@inject IServiceScopeFactory ScopeFactory
+
+<div class="alert alert-light d-flex justify-content-between align-items-center" role="status">
+    <span>
+        @{
+            var status = Status.GetStatus();
+        }
+        @if (status.LastRefresh is { } when)
+        {
+            <span>Last refreshed: @when.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss")</span>
+        }
+        else
+        {
+            <span>Never refreshed</span>
+        }
+        @if (status.LastError is { } error)
+        {
+            <span class="text-danger ms-2">⚠ Last refresh failed: @error</span>
+        }
+    </span>
+    <button class="btn btn-sm btn-outline-primary" @onclick="RefreshNow" disabled="@_refreshing">
+        @(_refreshing ? "Refreshing…" : "Refresh now")
+    </button>
+</div>
+
+@code {
+    private bool _refreshing;
+
+    private async Task RefreshNow()
+    {
+        _refreshing = true;
+        try
+        {
+            await using var scope = ScopeFactory.CreateAsyncScope();
+            var refresh = scope.ServiceProvider.GetRequiredService<IClusterRefreshService>();
+            await refresh.RefreshAsync(CancellationToken.None);
+        }
+        finally
+        {
+            _refreshing = false;
+        }
+    }
+}
