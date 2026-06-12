@@ -175,5 +175,6 @@ public class ClusterGraphBuilderTests
 
         // Assert
         Assert.Single(graph.Producers, e => e == new ProducerEdge("User:svc", "orders"));
+        Assert.Contains(new ConsumerEdge("User:svc", "orders"), graph.Consumers);
     }
 }
