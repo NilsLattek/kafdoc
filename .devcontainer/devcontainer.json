@@ -8,9 +8,16 @@
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
     "ghcr.io/anthropics/devcontainer-features/claude-code:1": {},
-    // Provides a Docker daemon inside the container so the Testcontainers-based
-    // integration tests (test/Kafdoc.InfrastructureTest) can spin up ephemeral brokers.
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "dockerDashComposeVersion": "none",
+      "installDockerBuildx": false,
+      "installDockerComposeSwitch": false
+    }
+  },
+  "containerEnv": {
+    // handles some issues with Testcontainers networking in devcontainers (Docker-in-Docker)
+    "TESTCONTAINERS_RYUK_DISABLED": "true",
+    "DOCKER_API_VERSION": "1.43"
   },
   // Configure tool-specific properties.
   "customizations": {
