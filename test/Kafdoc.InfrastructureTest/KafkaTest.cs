@@ -41,8 +41,13 @@ public class KafkaTest(ITestOutputHelper testOutputHelper)
     /// <summary>Path of the startup script copied into the container once its host port is known.</summary>
     private const string StartupScriptPath = "/tmp/tc-start.sh";
 
-    /// <summary>The host bootstrap servers once the broker is started.</summary>
-    protected string BootstrapServers => $"localhost:{Container.GetMappedPublicPort(ExternalPort)}";
+    /// <summary>
+    /// The host bootstrap servers once the broker is started. Uses <see cref="IContainer.Hostname"/>
+    /// (honouring <c>TESTCONTAINERS_HOST_OVERRIDE</c>) rather than a hardcoded <c>localhost</c>, so
+    /// it resolves correctly in docker-in-docker setups where published ports are reachable via the
+    /// bridge gateway rather than the test process's loopback.
+    /// </summary>
+    protected string BootstrapServers => $"{Container.Hostname}:{Container.GetMappedPublicPort(ExternalPort)}";
 
     /// <summary>Configures the secured KRaft broker container.</summary>
     protected override ContainerBuilder Configure() =>
@@ -81,7 +86,7 @@ public class KafkaTest(ITestOutputHelper testOutputHelper)
                 $"while [ ! -f {StartupScriptPath} ]; do sleep 0.1; done; exec /bin/bash {StartupScriptPath}")
             .WithStartupCallback((container, ct) =>
             {
-                var script = BuildStartupScript(container.GetMappedPublicPort(ExternalPort));
+                var script = BuildStartupScript(container.Hostname, container.GetMappedPublicPort(ExternalPort));
                 return container.CopyAsync(
                     Encoding.UTF8.GetBytes(script),
                     StartupScriptPath,
@@ -101,10 +106,11 @@ public class KafkaTest(ITestOutputHelper testOutputHelper)
     /// port, let the wrapper generate the config, then wipe and re-format the metadata log with
     /// <c>--add-scram</c> so the admin super-user exists before the broker starts.
     /// </summary>
+    /// <param name="advertisedHost">The host the test client reaches the broker on (see <see cref="BootstrapServers"/>).</param>
     /// <param name="externalPort">The host port mapped to the container's EXTERNAL listener.</param>
-    private static string BuildStartupScript(ushort externalPort) => $$"""
+    private static string BuildStartupScript(string advertisedHost, ushort externalPort) => $$"""
         set -e
-        export KAFKA_ADVERTISED_LISTENERS="BROKER://localhost:9094,EXTERNAL://localhost:{{externalPort}}"
+        export KAFKA_ADVERTISED_LISTENERS="BROKER://localhost:9094,EXTERNAL://{{advertisedHost}}:{{externalPort}}"
         . /etc/kafka/docker/configureDefaults
         . /etc/kafka/docker/configure
         /opt/kafka/bin/kafka-run-class.sh kafka.docker.KafkaDockerWrapper setup \

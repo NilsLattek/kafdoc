@@ -17,7 +17,11 @@
   "containerEnv": {
     // handles some issues with Testcontainers networking in devcontainers (Docker-in-Docker)
     "TESTCONTAINERS_RYUK_DISABLED": "true",
-    "DOCKER_API_VERSION": "1.43"
+    "DOCKER_API_VERSION": "1.43",
+    // Published container ports are reachable via the bridge gateway, not this container's
+    // loopback. Point Testcontainers' host (Container.Hostname) at the host-gateway alias added
+    // in docker-compose.yml so bootstrap addresses and advertised listeners resolve correctly.
+    "TESTCONTAINERS_HOST_OVERRIDE": "host.docker.internal"
   },
   // Configure tool-specific properties.
   "customizations": {

@@ -13,6 +13,12 @@ services:
     # Runs the app on the same network as the Kafka container so the web app can
     # reach the broker at localhost:9092 for local `dotnet run` smoke testing.
     network_mode: service:kafka
+
+    # Lets Testcontainers reach broker ports it publishes on the (outside) Docker host.
+    # host-gateway resolves to the bridge gateway, which is how published ports are reachable
+    # from this container; TESTCONTAINERS_HOST_OVERRIDE (see devcontainer.json) points at it.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     # user: root
 
