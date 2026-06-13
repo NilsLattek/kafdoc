@@ -11,6 +11,8 @@
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
     <PackageReference Include="Testcontainers" />
+    <PackageReference Include="Testcontainers.Kafka" />
+    <PackageReference Include="Testcontainers.XunitV3" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.analyzers" />
   </ItemGroup>

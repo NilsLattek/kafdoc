@@ -12,15 +12,15 @@ namespace Kafdoc.InfrastructureTest;
 /// Integration tests that drive <see cref="ConfluentKafkaClusterReader"/> against a real
 /// secured KRaft broker started via Testcontainers.
 /// </summary>
-public sealed class ConfluentKafkaClusterReaderTests : IAsyncLifetime
+public sealed class ConfluentKafkaClusterReaderTests(ITestOutputHelper testOutputHelper) : KafkaTest(testOutputHelper), IAsyncLifetime
 {
-    private readonly SecuredKafkaContainer _broker = new();
     private IAdminClient _admin = null!;
 
     /// <summary>Starts the broker, connects an admin client, and seeds test data.</summary>
-    public async ValueTask InitializeAsync()
+    protected override async ValueTask InitializeAsync()
     {
-        await _broker.StartAsync(TestContext.Current.CancellationToken);
+        await base.InitializeAsync();
+
         _admin = new AdminClientBuilder(AdminConfig()).Build();
         await SeedAsync();
     }
@@ -29,12 +29,11 @@ public sealed class ConfluentKafkaClusterReaderTests : IAsyncLifetime
     public async ValueTask DisposeAsync()
     {
         _admin?.Dispose();
-        await _broker.DisposeAsync();
     }
 
     private AdminClientConfig AdminConfig() => new()
     {
-        BootstrapServers = _broker.BootstrapServers,
+        BootstrapServers = BootstrapServers,
         SecurityProtocol = SecurityProtocol.SaslPlaintext,
         SaslMechanism = SaslMechanism.ScramSha512,
         SaslUsername = "admin",
