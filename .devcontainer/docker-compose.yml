@@ -10,13 +10,12 @@ services:
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
-    # Runs the app on the same network as the Kafka container so the web app can
-    # reach the broker at localhost:9092 for local `dotnet run` smoke testing.
-    network_mode: service:kafka
-
     # Lets Testcontainers reach broker ports it publishes on the (outside) Docker host.
     # host-gateway resolves to the bridge gateway, which is how published ports are reachable
     # from this container; TESTCONTAINERS_HOST_OVERRIDE (see devcontainer.json) points at it.
+    # NOTE: this is mutually exclusive with `network_mode: service:kafka` (Docker rejects
+    # custom host-to-IP mappings on a shared network namespace), so the app stays on the
+    # compose default network and reaches the dev broker by its service name `kafka:9092`.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     # Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
@@ -30,7 +29,7 @@ services:
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093"
       KAFKA_LISTENERS: "SASL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_ADVERTISED_LISTENERS: "SASL://localhost:9092"
+      KAFKA_ADVERTISED_LISTENERS: "SASL://kafka:9092"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "SASL:SASL_PLAINTEXT,CONTROLLER:PLAINTEXT"
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       KAFKA_INTER_BROKER_LISTENER_NAME: "SASL"

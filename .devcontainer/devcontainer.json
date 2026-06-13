@@ -27,14 +27,13 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-dotnettools.csdevkit",
-        "openai.chatgpt"
+        "ms-dotnettools.csdevkit"
       ],
       "settings": {
         "editor.formatOnSave": true
       }
     }
-  },
+  }
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [5000, 5001],
   // Restore packages once the container is created.
