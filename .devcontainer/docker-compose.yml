@@ -24,7 +24,30 @@ services:
   kafka:
     image: apache/kafka:3.8.0
     restart: unless-stopped
+    # The stock image entrypoint formats storage but cannot seed a SCRAM credential, so the
+    # admin super-user would have nothing to authenticate against. Mirror the integration-test
+    # fixture (test/Kafdoc.InfrastructureTest/KafkaTest.cs): generate the config via the image's
+    # wrapper, then re-format the metadata log with --add-scram before starting the broker.
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        . /etc/kafka/docker/configureDefaults
+        . /etc/kafka/docker/configure
+        /opt/kafka/bin/kafka-run-class.sh kafka.docker.KafkaDockerWrapper setup \
+          --default-configs-dir /etc/kafka/docker \
+          --mounted-configs-dir /mnt/shared/config \
+          --final-configs-dir /opt/kafka/config
+        LOGDIR=$$(grep '^log.dirs' /opt/kafka/config/server.properties | cut -d= -f2)
+        LOGDIR=$${LOGDIR:-/tmp/kafka-logs}
+        rm -rf "$${LOGDIR:?}"/*
+        /opt/kafka/bin/kafka-storage.sh format -t "$$CLUSTER_ID" \
+          -c /opt/kafka/config/server.properties \
+          --add-scram "SCRAM-SHA-512=[name=admin,password=admin-secret]"
+        exec /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
     environment:
+      CLUSTER_ID: "5L6g3nShT-eMCtK--X86sw"
       KAFKA_NODE_ID: "1"
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093"
