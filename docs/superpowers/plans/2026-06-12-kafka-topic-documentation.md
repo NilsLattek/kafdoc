@@ -70,7 +70,7 @@
 - Delete (old stub tests): `test/Kafdoc.DomainTest/ChartServiceTests.cs`, `test/Kafdoc.ApplicationTest/Services/ChartAppServiceTests.cs`, `test/Kafdoc.WebTest/OrgNodeBoxTests.cs`
 - Modify: `src/Kafdoc.Application/Mapper/ExampleMapper.cs`, `src/Kafdoc.Web/Program.cs`, `src/Kafdoc.Web/appsettings.Development.json`, `Directory.Packages.props`
 
-- [ ] **Step 1: Remove EF/Ardalis packages from `Directory.Packages.props`**
+- [x] **Step 1: Remove EF/Ardalis packages from `Directory.Packages.props`**
 
 Delete these `<PackageVersion>` lines:
 
@@ -92,7 +92,7 @@ Add these new `<PackageVersion>` lines (verify latest via mslearn):
 <PackageVersion Include="Testcontainers" Version="4.1.0" />
 ```
 
-- [ ] **Step 2: Rewrite `src/Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj`**
+- [x] **Step 2: Rewrite `src/Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj`**
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -111,7 +111,7 @@ Add these new `<PackageVersion>` lines (verify latest via mslearn):
 </Project>
 ```
 
-- [ ] **Step 3: Rewrite `src/Kafdoc.Domain/Kafdoc.Domain.csproj`** (drop Ardalis)
+- [x] **Step 3: Rewrite `src/Kafdoc.Domain/Kafdoc.Domain.csproj`** (drop Ardalis)
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -125,7 +125,7 @@ Add these new `<PackageVersion>` lines (verify latest via mslearn):
 </Project>
 ```
 
-- [ ] **Step 4: Rewrite `src/Kafdoc.Web/Kafdoc.Web.csproj`** (drop EF design)
+- [x] **Step 4: Rewrite `src/Kafdoc.Web/Kafdoc.Web.csproj`** (drop EF design)
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.Web">
@@ -142,7 +142,7 @@ Add these new `<PackageVersion>` lines (verify latest via mslearn):
 </Project>
 ```
 
-- [ ] **Step 5: Add Hosting/Options packages to `src/Kafdoc.Application/Kafdoc.Application.csproj`**
+- [x] **Step 5: Add Hosting/Options packages to `src/Kafdoc.Application/Kafdoc.Application.csproj`**
 
 Add inside the existing `<ItemGroup>` of `<PackageReference>`s:
 
@@ -151,7 +151,7 @@ Add inside the existing `<ItemGroup>` of `<PackageReference>`s:
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
 ```
 
-- [ ] **Step 6: Delete obsolete source and test files**
+- [x] **Step 6: Delete obsolete source and test files**
 
 ```bash
 git rm src/Kafdoc.Domain/IRepository.cs \
@@ -170,7 +170,7 @@ git rm src/Kafdoc.Domain/IRepository.cs \
        test/Kafdoc.WebTest/OrgNodeBoxTests.cs
 ```
 
-- [ ] **Step 7: Replace `src/Kafdoc.Application/Mapper/ExampleMapper.cs`** with an empty placeholder (real mapper added in Task 5)
+- [x] **Step 7: Replace `src/Kafdoc.Application/Mapper/ExampleMapper.cs`** with an empty placeholder (real mapper added in Task 5)
 
 Delete the file for now:
 
@@ -178,7 +178,7 @@ Delete the file for now:
 git rm src/Kafdoc.Application/Mapper/ExampleMapper.cs
 ```
 
-- [ ] **Step 8: Replace `src/Kafdoc.Domain/Configuration.cs`** (remove `TopicService` registration; leave an empty body the later tasks extend)
+- [x] **Step 8: Replace `src/Kafdoc.Domain/Configuration.cs`** (remove `TopicService` registration; leave an empty body the later tasks extend)
 
 ```csharp
 using Microsoft.Extensions.Configuration;
@@ -203,7 +203,7 @@ public static class Configuration
 }
 ```
 
-- [ ] **Step 9: Replace `src/Kafdoc.Application/Configuration.cs`** (remove `ITopicAppService` registration)
+- [x] **Step 9: Replace `src/Kafdoc.Application/Configuration.cs`** (remove `ITopicAppService` registration)
 
 ```csharp
 using Microsoft.Extensions.Configuration;
@@ -228,7 +228,7 @@ public static class Configuration
 }
 ```
 
-- [ ] **Step 9b: Replace `src/Kafdoc.Infrastructure/Configuration.cs`** with an EF-free placeholder (the EF `using` would otherwise break the build until Task 7)
+- [x] **Step 9b: Replace `src/Kafdoc.Infrastructure/Configuration.cs`** with an EF-free placeholder (the EF `using` would otherwise break the build until Task 7)
 
 ```csharp
 using Microsoft.Extensions.Configuration;
@@ -253,7 +253,7 @@ public static class Configuration
 }
 ```
 
-- [ ] **Step 9c: Remove the dead `@using Kafdoc.Web.Extensions` from `src/Kafdoc.Web/Components/_Imports.razor`**
+- [x] **Step 9c: Remove the dead `@using Kafdoc.Web.Extensions` from `src/Kafdoc.Web/Components/_Imports.razor`**
 
 Delete this line (the `Extensions` namespace is now empty after deleting `ServiceScopeExtensions.cs`, so the directive would fail to compile):
 
@@ -261,7 +261,7 @@ Delete this line (the `Extensions` namespace is now empty after deleting `Servic
 @using Kafdoc.Web.Extensions
 ```
 
-- [ ] **Step 10: Append `public partial class Program;` to `src/Kafdoc.Web/Program.cs`** (stable assembly anchor for architecture tests)
+- [x] **Step 10: Append `public partial class Program;` to `src/Kafdoc.Web/Program.cs`** (stable assembly anchor for architecture tests)
 
 Add as the last line of the file:
 
@@ -271,7 +271,7 @@ Add as the last line of the file:
 public partial class Program;
 ```
 
-- [ ] **Step 11: Clean `src/Kafdoc.Web/appsettings.Development.json`** (remove EF/Postgres settings)
+- [x] **Step 11: Clean `src/Kafdoc.Web/appsettings.Development.json`** (remove EF/Postgres settings)
 
 ```json
 {
@@ -286,7 +286,7 @@ public partial class Program;
 }
 ```
 
-- [ ] **Step 12: Update `test/Kafdoc.ArchitectureTest/ArchitectureModel.cs` anchors**
+- [x] **Step 12: Update `test/Kafdoc.ArchitectureTest/ArchitectureModel.cs` anchors**
 
 Replace the three anchor lines that reference removed types:
 
@@ -309,7 +309,7 @@ Replace the three anchor lines that reference removed types:
 
 > These anchor types are created in Tasks 2, 5, 7. The architecture-test project will not compile until those tasks are done — that is expected; this task's build verification (Step 14) covers `src/` only.
 
-- [ ] **Step 13: Update architecture test rules for the new layering**
+- [x] **Step 13: Update architecture test rules for the new layering**
 
 In `test/Kafdoc.ArchitectureTest/NamingConventionTests.cs`, delete the `Specifications_end_with_spec_suffix` test method entirely (no `Specifications` namespace remains). Keep `Mappers_end_with_mapper_suffix`.
 
@@ -330,12 +330,12 @@ In `test/Kafdoc.ArchitectureTest/ApplicationServiceTests.cs`, broaden the rule t
     }
 ```
 
-- [ ] **Step 14: Build `src/` to verify the baseline compiles**
+- [x] **Step 14: Build `src/` to verify the baseline compiles**
 
 Run: `dotnet build --no-restore src/Kafdoc.Web/Kafdoc.Web.csproj -warnaserror`
 Expected: PASS (no warnings). The architecture test project is intentionally not built here.
 
-- [ ] **Step 15: Commit**
+- [x] **Step 15: Commit**
 
 ```bash
 git add -A
@@ -349,7 +349,7 @@ git commit -m "chore: strip EF/Postgres stack and old placeholder code"
 **Files:**
 - Create: `src/Kafdoc.Domain/Kafka/RawClusterData.cs`, `src/Kafdoc.Domain/Kafka/IKafkaClusterReader.cs`
 
-- [ ] **Step 1: Create `src/Kafdoc.Domain/Kafka/RawClusterData.cs`**
+- [x] **Step 1: Create `src/Kafdoc.Domain/Kafka/RawClusterData.cs`**
 
 ```csharp
 namespace Kafdoc.Domain.Kafka;
@@ -451,7 +451,7 @@ public sealed record RawClusterData(
     IReadOnlyList<RawScramUser> ScramUsers);
 ```
 
-- [ ] **Step 2: Create `src/Kafdoc.Domain/Kafka/IKafkaClusterReader.cs`**
+- [x] **Step 2: Create `src/Kafdoc.Domain/Kafka/IKafkaClusterReader.cs`**
 
 ```csharp
 namespace Kafdoc.Domain.Kafka;
@@ -471,12 +471,12 @@ public interface IKafkaClusterReader
 }
 ```
 
-- [ ] **Step 3: Build the Domain project**
+- [x] **Step 3: Build the Domain project**
 
 Run: `dotnet build --no-restore src/Kafdoc.Domain/Kafdoc.Domain.csproj -warnaserror`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/Kafdoc.Domain/Kafka
@@ -490,7 +490,7 @@ git commit -m "feat(domain): add raw Kafka facts and reader abstraction"
 **Files:**
 - Create: `src/Kafdoc.Domain/Graph/KafkaTopic.cs`, `KafkaUser.cs`, `KafkaConsumerGroup.cs`, `GraphEdges.cs`, `ClusterGraph.cs`, `ClusterSnapshot.cs`
 
-- [ ] **Step 1: Create the node records**
+- [x] **Step 1: Create the node records**
 
 `src/Kafdoc.Domain/Graph/KafkaTopic.cs`:
 ```csharp
@@ -523,7 +523,7 @@ namespace Kafdoc.Domain.Graph;
 public sealed record KafkaConsumerGroup(string GroupId, string State, int MemberCount);
 ```
 
-- [ ] **Step 2: Create `src/Kafdoc.Domain/Graph/GraphEdges.cs`**
+- [x] **Step 2: Create `src/Kafdoc.Domain/Graph/GraphEdges.cs`**
 
 ```csharp
 namespace Kafdoc.Domain.Graph;
@@ -549,7 +549,7 @@ public sealed record UserGroupEdge(string Principal, string GroupId);
 public sealed record GroupTopicEdge(string GroupId, string Topic);
 ```
 
-- [ ] **Step 3: Create `src/Kafdoc.Domain/Graph/ClusterGraph.cs`**
+- [x] **Step 3: Create `src/Kafdoc.Domain/Graph/ClusterGraph.cs`**
 
 ```csharp
 namespace Kafdoc.Domain.Graph;
@@ -575,7 +575,7 @@ public sealed record ClusterGraph(
     IReadOnlyList<GroupTopicEdge> GroupConsumption);
 ```
 
-- [ ] **Step 4: Create `src/Kafdoc.Domain/Graph/ClusterSnapshot.cs`**
+- [x] **Step 4: Create `src/Kafdoc.Domain/Graph/ClusterSnapshot.cs`**
 
 ```csharp
 namespace Kafdoc.Domain.Graph;
@@ -586,12 +586,12 @@ namespace Kafdoc.Domain.Graph;
 public sealed record ClusterSnapshot(ClusterGraph Graph, DateTimeOffset CapturedAt);
 ```
 
-- [ ] **Step 5: Build**
+- [x] **Step 5: Build**
 
 Run: `dotnet build --no-restore src/Kafdoc.Domain/Kafdoc.Domain.csproj -warnaserror`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/Kafdoc.Domain/Graph
@@ -615,9 +615,9 @@ This is the core logic. Build it test-first. The builder turns `RawClusterData` 
 - Create: `src/Kafdoc.Domain/Graph/ClusterGraphBuilder.cs`
 - Test: `test/Kafdoc.DomainTest/Graph/ClusterGraphBuilderTests.cs`
 
-- [ ] **Step 1: Add a Domain project reference to `Kafdoc.Domain.csproj`?** — not needed; `Kafdoc.DomainTest` already references Domain. Confirm by opening `test/Kafdoc.DomainTest/Kafdoc.DomainTest.csproj` (already references `../../src/Kafdoc.Domain/Kafdoc.Domain.csproj`). No change.
+- [x] **Step 1: Add a Domain project reference to `Kafdoc.Domain.csproj`?** — not needed; `Kafdoc.DomainTest` already references Domain. Confirm by opening `test/Kafdoc.DomainTest/Kafdoc.DomainTest.csproj` (already references `../../src/Kafdoc.Domain/Kafdoc.Domain.csproj`). No change.
 
-- [ ] **Step 2: Write the failing test file `test/Kafdoc.DomainTest/Graph/ClusterGraphBuilderTests.cs`**
+- [x] **Step 2: Write the failing test file `test/Kafdoc.DomainTest/Graph/ClusterGraphBuilderTests.cs`**
 
 ```csharp
 using Kafdoc.Domain.Graph;
@@ -801,12 +801,12 @@ public class ClusterGraphBuilderTests
 }
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail to compile (builder missing)**
+- [x] **Step 3: Run the tests to verify they fail to compile (builder missing)**
 
 Run: `dotnet test --no-restore test/Kafdoc.DomainTest --filter-class "*ClusterGraphBuilderTests*"`
 Expected: FAIL — `ClusterGraphBuilder` does not exist.
 
-- [ ] **Step 4: Implement `src/Kafdoc.Domain/Graph/ClusterGraphBuilder.cs`**
+- [x] **Step 4: Implement `src/Kafdoc.Domain/Graph/ClusterGraphBuilder.cs`**
 
 ```csharp
 using Kafdoc.Domain.Kafka;
@@ -912,12 +912,12 @@ public sealed class ClusterGraphBuilder
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `dotnet test --no-restore test/Kafdoc.DomainTest --filter-class "*ClusterGraphBuilderTests*"`
 Expected: PASS (all 9 tests).
 
-- [ ] **Step 6: Register the builder in `src/Kafdoc.Domain/Configuration.cs`**
+- [x] **Step 6: Register the builder in `src/Kafdoc.Domain/Configuration.cs`**
 
 Replace the comment in `ConfigureDomain` with:
 
@@ -925,7 +925,7 @@ Replace the comment in `ConfigureDomain` with:
         services.AddSingleton<Kafdoc.Domain.Graph.ClusterGraphBuilder>();
 ```
 
-- [ ] **Step 7: Build and commit**
+- [x] **Step 7: Build and commit**
 
 Run: `dotnet build --no-restore src/Kafdoc.Domain/Kafdoc.Domain.csproj -warnaserror`
 Expected: PASS.
@@ -945,7 +945,7 @@ git commit -m "feat(domain): implement ClusterGraphBuilder with unit tests"
 - Create: `src/Kafdoc.Application/Services/ITopicQueryService.cs`, `TopicQueryService.cs`, `IUserQueryService.cs`, `UserQueryService.cs`, `ISnapshotStatusService.cs`, `SnapshotStatusService.cs`
 - Test: `test/Kafdoc.ApplicationTest/Snapshot/ClusterRefreshServiceTests.cs`, `test/Kafdoc.ApplicationTest/Services/TopicQueryServiceTests.cs`
 
-- [ ] **Step 1: Create `src/Kafdoc.Application/Snapshot/ISnapshotStore.cs`**
+- [x] **Step 1: Create `src/Kafdoc.Application/Snapshot/ISnapshotStore.cs`**
 
 ```csharp
 using Kafdoc.Domain.Graph;
@@ -980,7 +980,7 @@ public interface ISnapshotStore
 }
 ```
 
-- [ ] **Step 2: Create `src/Kafdoc.Application/Snapshot/SnapshotStore.cs`**
+- [x] **Step 2: Create `src/Kafdoc.Application/Snapshot/SnapshotStore.cs`**
 
 ```csharp
 using Kafdoc.Domain.Graph;
@@ -1018,7 +1018,7 @@ internal sealed class SnapshotStore : ISnapshotStore
 }
 ```
 
-- [ ] **Step 3: Create `src/Kafdoc.Application/Snapshot/RefreshOptions.cs`**
+- [x] **Step 3: Create `src/Kafdoc.Application/Snapshot/RefreshOptions.cs`**
 
 ```csharp
 namespace Kafdoc.Application.Snapshot;
@@ -1034,7 +1034,7 @@ public sealed class RefreshOptions
 }
 ```
 
-- [ ] **Step 4: Create `src/Kafdoc.Application/Snapshot/IClusterRefreshService.cs`**
+- [x] **Step 4: Create `src/Kafdoc.Application/Snapshot/IClusterRefreshService.cs`**
 
 ```csharp
 using FluentResults;
@@ -1054,7 +1054,7 @@ public interface IClusterRefreshService
 }
 ```
 
-- [ ] **Step 5: Write the failing test `test/Kafdoc.ApplicationTest/Snapshot/ClusterRefreshServiceTests.cs`**
+- [x] **Step 5: Write the failing test `test/Kafdoc.ApplicationTest/Snapshot/ClusterRefreshServiceTests.cs`**
 
 ```csharp
 using Microsoft.Extensions.Time.Testing;
@@ -1118,12 +1118,12 @@ public class ClusterRefreshServiceTests
 
 > Add `<PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.0.9" />` to `Directory.Packages.props` and `<PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />` to `test/Kafdoc.ApplicationTest/Kafdoc.ApplicationTest.csproj` (verify version via mslearn; on .NET 10 `FakeTimeProvider` lives in this package).
 
-- [ ] **Step 6: Run the test to verify it fails**
+- [x] **Step 6: Run the test to verify it fails**
 
 Run: `dotnet test --no-restore test/Kafdoc.ApplicationTest --filter-class "*ClusterRefreshServiceTests*"`
 Expected: FAIL — `ClusterRefreshService` does not exist.
 
-- [ ] **Step 7: Implement `src/Kafdoc.Application/Snapshot/ClusterRefreshService.cs`**
+- [x] **Step 7: Implement `src/Kafdoc.Application/Snapshot/ClusterRefreshService.cs`**
 
 ```csharp
 using FluentResults;
@@ -1165,12 +1165,12 @@ internal sealed class ClusterRefreshService(
 }
 ```
 
-- [ ] **Step 8: Run the test to verify it passes**
+- [x] **Step 8: Run the test to verify it passes**
 
 Run: `dotnet test --no-restore test/Kafdoc.ApplicationTest --filter-class "*ClusterRefreshServiceTests*"`
 Expected: PASS.
 
-- [ ] **Step 9: Create the DTOs**
+- [x] **Step 9: Create the DTOs**
 
 `src/Kafdoc.Application/Dtos/TopicSummaryDto.cs`:
 ```csharp
@@ -1254,7 +1254,7 @@ namespace Kafdoc.Application.Dtos;
 public sealed record SnapshotStatusDto(bool IsReady, DateTimeOffset? LastRefresh, string? LastError);
 ```
 
-- [ ] **Step 10: Create the query-service interfaces**
+- [x] **Step 10: Create the query-service interfaces**
 
 `src/Kafdoc.Application/Services/ITopicQueryService.cs`:
 ```csharp
@@ -1306,7 +1306,7 @@ public interface ISnapshotStatusService
 }
 ```
 
-- [ ] **Step 11: Write the failing test `test/Kafdoc.ApplicationTest/Services/TopicQueryServiceTests.cs`**
+- [x] **Step 11: Write the failing test `test/Kafdoc.ApplicationTest/Services/TopicQueryServiceTests.cs`**
 
 ```csharp
 using Kafdoc.Application.Services;
@@ -1399,12 +1399,12 @@ public class TopicQueryServiceTests
 }
 ```
 
-- [ ] **Step 12: Run the test to verify it fails**
+- [x] **Step 12: Run the test to verify it fails**
 
 Run: `dotnet test --no-restore test/Kafdoc.ApplicationTest --filter-class "*TopicQueryServiceTests*"`
 Expected: FAIL — `TopicQueryService` does not exist.
 
-- [ ] **Step 13: Implement `src/Kafdoc.Application/Services/TopicQueryService.cs`**
+- [x] **Step 13: Implement `src/Kafdoc.Application/Services/TopicQueryService.cs`**
 
 ```csharp
 using Kafdoc.Application.Dtos;
@@ -1498,12 +1498,12 @@ internal sealed class TopicQueryService(ISnapshotStore store) : ITopicQueryServi
 }
 ```
 
-- [ ] **Step 14: Run the test to verify it passes**
+- [x] **Step 14: Run the test to verify it passes**
 
 Run: `dotnet test --no-restore test/Kafdoc.ApplicationTest --filter-class "*TopicQueryServiceTests*"`
 Expected: PASS.
 
-- [ ] **Step 15: Implement `src/Kafdoc.Application/Services/UserQueryService.cs`**
+- [x] **Step 15: Implement `src/Kafdoc.Application/Services/UserQueryService.cs`**
 
 ```csharp
 using Kafdoc.Application.Dtos;
@@ -1566,7 +1566,7 @@ internal sealed class UserQueryService(ISnapshotStore store) : IUserQueryService
 }
 ```
 
-- [ ] **Step 16: Create the status mapper and service**
+- [x] **Step 16: Create the status mapper and service**
 
 `src/Kafdoc.Application/Mapper/SnapshotStatusMapper.cs`:
 ```csharp
@@ -1605,12 +1605,12 @@ internal sealed class SnapshotStatusService(ISnapshotStore store) : ISnapshotSta
 
 > If Mapperly complains about mapping `ISnapshotStore` (an interface with read-only properties), it maps property-by-property by name (`IsReady`, `LastRefresh`, `LastError`) which match the DTO exactly. If the generator rejects the interface source, replace the mapper body with a hand-written `new SnapshotStatusDto(store.IsReady, store.LastRefresh, store.LastError)` in `SnapshotStatusService` and delete the mapper file.
 
-- [ ] **Step 17: Build the Application project**
+- [x] **Step 17: Build the Application project**
 
 Run: `dotnet build --no-restore src/Kafdoc.Application/Kafdoc.Application.csproj -warnaserror`
 Expected: PASS.
 
-- [ ] **Step 18: Commit**
+- [x] **Step 18: Commit**
 
 ```bash
 git add src/Kafdoc.Application test/Kafdoc.ApplicationTest Directory.Packages.props
@@ -1625,7 +1625,7 @@ git commit -m "feat(application): snapshot store, refresh service, DTOs, query s
 - Create: `src/Kafdoc.Application/Snapshot/ClusterRefreshHostedService.cs`
 - Modify: `src/Kafdoc.Application/Configuration.cs`
 
-- [ ] **Step 1: Create `src/Kafdoc.Application/Snapshot/ClusterRefreshHostedService.cs`**
+- [x] **Step 1: Create `src/Kafdoc.Application/Snapshot/ClusterRefreshHostedService.cs`**
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
@@ -1675,11 +1675,11 @@ internal sealed class ClusterRefreshHostedService(
 }
 ```
 
-- [ ] **Step 2: Add `Microsoft.Extensions.Logging.Abstractions` if needed**
+- [x] **Step 2: Add `Microsoft.Extensions.Logging.Abstractions` if needed**
 
 `ILogger<T>` comes transitively via Hosting.Abstractions; if the build reports it missing, add `<PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />` to `Directory.Packages.props` and a version-less `PackageReference` to the Application csproj.
 
-- [ ] **Step 3: Register everything in `src/Kafdoc.Application/Configuration.cs`**
+- [x] **Step 3: Register everything in `src/Kafdoc.Application/Configuration.cs`**
 
 Replace the body of `ConfigureApplication`:
 
@@ -1703,13 +1703,13 @@ Add the required usings at the top of the file:
 using System;
 ```
 
-- [ ] **Step 4: Build and run all Application tests**
+- [x] **Step 4: Build and run all Application tests**
 
 Run: `dotnet build --no-restore src/Kafdoc.Application/Kafdoc.Application.csproj -warnaserror`
 Then: `dotnet test --no-restore test/Kafdoc.ApplicationTest`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/Kafdoc.Application
@@ -1726,7 +1726,7 @@ git commit -m "feat(application): background refresh hosted service and DI wirin
 
 > This task talks to the real Confluent.Kafka API; method/enum names below are from `Confluent.Kafka` v2.x. Confirm exact member names with the `mslearn` MCP server or the package's IntelliSense as you write. The adapter performs **fetching and mapping only** — no derivation.
 
-- [ ] **Step 1: Create `src/Kafdoc.Infrastructure/Kafka/KafkaConnectionOptions.cs`**
+- [x] **Step 1: Create `src/Kafdoc.Infrastructure/Kafka/KafkaConnectionOptions.cs`**
 
 ```csharp
 namespace Kafdoc.Infrastructure.Kafka;
@@ -1760,7 +1760,7 @@ public sealed class KafkaConnectionOptions
 }
 ```
 
-- [ ] **Step 2: Create `src/Kafdoc.Infrastructure/Kafka/ConfluentKafkaClusterReader.cs`**
+- [x] **Step 2: Create `src/Kafdoc.Infrastructure/Kafka/ConfluentKafkaClusterReader.cs`**
 
 ```csharp
 using Confluent.Kafka;
@@ -1913,7 +1913,7 @@ internal sealed class ConfluentKafkaClusterReader(
 
 > If a member name differs in your Confluent.Kafka version (e.g. the offsets result shape, or `ResourceType.Broker` vs `Cluster`), adjust the mapping and keep the `Raw*` output identical. The Domain tests do not depend on Confluent types, so the contract is stable.
 
-- [ ] **Step 3: Replace `src/Kafdoc.Infrastructure/Configuration.cs`**
+- [x] **Step 3: Replace `src/Kafdoc.Infrastructure/Configuration.cs`**
 
 ```csharp
 using Confluent.Kafka;
@@ -1959,12 +1959,12 @@ public static class Configuration
 }
 ```
 
-- [ ] **Step 4: Build the Infrastructure project**
+- [x] **Step 4: Build the Infrastructure project**
 
 Run: `dotnet build --no-restore src/Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj -warnaserror`
 Expected: PASS. Fix any Confluent member-name mismatches now.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/Kafdoc.Infrastructure
@@ -1980,7 +1980,7 @@ git commit -m "feat(infrastructure): Confluent Kafka cluster reader and DI"
 - Modify: `src/Kafdoc.Web/Components/Layout/NavMenu.razor`, `src/Kafdoc.Web/Components/Pages/NotFound.razor` (leave as-is), `src/Kafdoc.Web/appsettings.json`
 - Test: `test/Kafdoc.WebTest/TopicsPageTests.cs`
 
-- [ ] **Step 1: Create `src/Kafdoc.Web/Components/Pages/Topics.razor`**
+- [x] **Step 1: Create `src/Kafdoc.Web/Components/Pages/Topics.razor`**
 
 ```razor
 @page "/"
@@ -2036,7 +2036,7 @@ else
 }
 ```
 
-- [ ] **Step 2: Create `src/Kafdoc.Web/Components/Pages/TopicDetail.razor`**
+- [x] **Step 2: Create `src/Kafdoc.Web/Components/Pages/TopicDetail.razor`**
 
 ```razor
 @page "/topics/{Name}"
@@ -2108,7 +2108,7 @@ else
 }
 ```
 
-- [ ] **Step 3: Create `src/Kafdoc.Web/Components/Pages/Users.razor`**
+- [x] **Step 3: Create `src/Kafdoc.Web/Components/Pages/Users.razor`**
 
 ```razor
 @page "/users"
@@ -2148,7 +2148,7 @@ else
 }
 ```
 
-- [ ] **Step 4: Create `src/Kafdoc.Web/Components/Layout/RefreshStatus.razor`**
+- [x] **Step 4: Create `src/Kafdoc.Web/Components/Layout/RefreshStatus.razor`**
 
 ```razor
 @rendermode InteractiveServer
@@ -2202,7 +2202,7 @@ else
 
 > `RefreshStatus` injects `IClusterRefreshService` via a fresh scope (it is scoped). This is the only place a Web component reaches an Application orchestration service directly, which is allowed (Web → Application). It does not touch Domain or Infrastructure types, so `WebIsolationTests` stays green.
 
-- [ ] **Step 5: Update `src/Kafdoc.Web/Components/Layout/NavMenu.razor`** nav links
+- [x] **Step 5: Update `src/Kafdoc.Web/Components/Layout/NavMenu.razor`** nav links
 
 Replace the three `<div class="nav-item px-3">` blocks (Home/Counter/Weather) with:
 
@@ -2220,7 +2220,7 @@ Replace the three `<div class="nav-item px-3">` blocks (Home/Counter/Weather) wi
         </div>
 ```
 
-- [ ] **Step 6: Add a `Kafka` config section to `src/Kafdoc.Web/appsettings.json`**
+- [x] **Step 6: Add a `Kafka` config section to `src/Kafdoc.Web/appsettings.json`**
 
 Add this top-level section (secrets stay empty here; supply via env/user-secrets):
 
@@ -2236,7 +2236,7 @@ Add this top-level section (secrets stay empty here; supply via env/user-secrets
   }
 ```
 
-- [ ] **Step 7: Write the bUnit test `test/Kafdoc.WebTest/TopicsPageTests.cs`**
+- [x] **Step 7: Write the bUnit test `test/Kafdoc.WebTest/TopicsPageTests.cs`**
 
 ```csharp
 using Bunit;
@@ -2297,22 +2297,22 @@ public sealed class TopicsPageTests : Bunit.BunitContext
 
 > `RefreshStatus` is rendered inside `Topics` and injects `IServiceScopeFactory`; bUnit provides one through its service provider, and `GetStatus()` is stubbed, so no extra setup is needed. If bUnit cannot resolve `IClusterRefreshService` during render, it is not needed at render time (only on button click), so the test stays green. If render throws resolving it, register `Services.AddScoped(_ => Substitute.For<IClusterRefreshService>());`.
 
-- [ ] **Step 8: Run the Web tests**
+- [x] **Step 8: Run the Web tests**
 
 Run: `dotnet test --no-restore test/Kafdoc.WebTest`
 Expected: PASS.
 
-- [ ] **Step 9: Build the whole solution**
+- [x] **Step 9: Build the whole solution**
 
 Run: `dotnet build --no-restore -warnaserror`
 Expected: PASS (including architecture tests now that all anchor types exist).
 
-- [ ] **Step 10: Run the architecture tests**
+- [x] **Step 10: Run the architecture tests**
 
 Run: `dotnet test --no-restore test/Kafdoc.ArchitectureTest`
 Expected: PASS. If `WebIsolationTests` fails, confirm no page imports a Domain/Infrastructure namespace (only `Kafdoc.Application.*`).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add src/Kafdoc.Web test/Kafdoc.WebTest
@@ -2329,7 +2329,7 @@ Spin up a secured KRaft broker via Testcontainers (SASL_PLAINTEXT + `StandardAut
 - Create: `test/Kafdoc.InfrastructureTest/Kafdoc.InfrastructureTest.csproj`, `test/Kafdoc.InfrastructureTest/SecuredKafkaContainer.cs`, `test/Kafdoc.InfrastructureTest/ConfluentKafkaClusterReaderTests.cs`
 - Modify: `Kafdoc.slnx`
 
-- [ ] **Step 1: Create `test/Kafdoc.InfrastructureTest/Kafdoc.InfrastructureTest.csproj`**
+- [x] **Step 1: Create `test/Kafdoc.InfrastructureTest/Kafdoc.InfrastructureTest.csproj`**
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -2364,14 +2364,14 @@ Spin up a secured KRaft broker via Testcontainers (SASL_PLAINTEXT + `StandardAut
 </Project>
 ```
 
-- [ ] **Step 2: Register the new test project in `Kafdoc.slnx`**
+- [x] **Step 2: Register the new test project in `Kafdoc.slnx`**
 
 Add inside the `/test/` folder:
 ```xml
     <Project Path="test/Kafdoc.InfrastructureTest/Kafdoc.InfrastructureTest.csproj" />
 ```
 
-- [ ] **Step 3: Create `test/Kafdoc.InfrastructureTest/SecuredKafkaContainer.cs`**
+- [x] **Step 3: Create `test/Kafdoc.InfrastructureTest/SecuredKafkaContainer.cs`**
 
 A single-node KRaft broker configured for SASL_PLAINTEXT with the standard authorizer and a super-user, built with the generic `ContainerBuilder`. Uses the `apache/kafka` image.
 
@@ -2438,7 +2438,7 @@ internal sealed class SecuredKafkaContainer
 
 > **This container config is the riskiest part of the plan.** Secured KRaft brokers are sensitive to exact env-var spelling and to provisioning the bootstrap SCRAM admin credential. Verify against the Apache Kafka Docker image docs (`apache/kafka` README) and the Testcontainers .NET docs via mslearn/WebFetch. If bootstrapping the SCRAM admin via env proves unreliable, fall back to: start the broker with a PLAINTEXT inter-broker listener + `KAFKA_SUPER_USERS=User:ANONYMOUS`, create the admin SCRAM credential with `kafka-storage`/`kafka-configs` via `ExecAsync` before connecting, then connect over SASL. Spike this container in isolation (a throwaway `[Fact]` that just starts it and runs `GetMetadata`) before writing the assertions in Step 4.
 
-- [ ] **Step 4: Create `test/Kafdoc.InfrastructureTest/ConfluentKafkaClusterReaderTests.cs`**
+- [x] **Step 4: Create `test/Kafdoc.InfrastructureTest/ConfluentKafkaClusterReaderTests.cs`**
 
 Seed the cluster with the admin client (create a topic, an ACL, a SCRAM user, and commit an offset for a group), then exercise the reader. Use the real `ConfluentKafkaClusterReader` with hand-built options.
 
@@ -2528,12 +2528,12 @@ public sealed class ConfluentKafkaClusterReaderTests : IAsyncLifetime
 
 > `TestContext.Current.CancellationToken` is the xUnit v3 idiom for the per-test token. Reuse the started broker across tests with an `IClassFixture`/`IAsyncLifetime` if you add more cases, to avoid paying broker startup per test.
 
-- [ ] **Step 5: Run the integration test**
+- [x] **Step 5: Run the integration test**
 
 Run: `dotnet test --no-restore test/Kafdoc.InfrastructureTest`
 Expected: PASS. Requires a reachable Docker daemon (see Task 10 devcontainer prerequisite). If the broker won't start, iterate on `SecuredKafkaContainer` per the Step 3 fallback before touching assertions.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add test/Kafdoc.InfrastructureTest Kafdoc.slnx
@@ -2547,7 +2547,7 @@ git commit -m "test(infrastructure): secured-broker integration tests for the Ka
 **Files:**
 - Modify: `.devcontainer/docker-compose.yml`, `.devcontainer/devcontainer.json`, `CLAUDE.md`
 
-- [ ] **Step 1: Replace the Postgres `db` service with a secured Kafka service in `.devcontainer/docker-compose.yml`**
+- [x] **Step 1: Replace the Postgres `db` service with a secured Kafka service in `.devcontainer/docker-compose.yml`**
 
 Replace the entire file with:
 
@@ -2586,7 +2586,7 @@ services:
 
 > Use the **same** broker configuration validated in Task 9's `SecuredKafkaContainer`. If Task 9 settled on the PLAINTEXT-inter-broker + `kafka-configs` admin-provisioning fallback, mirror that here (and add a small init step or documented manual `kafka-configs` command to create the `admin` SCRAM credential and seed sample topics/ACLs/users for a useful local graph).
 
-- [ ] **Step 2: Update `.devcontainer/devcontainer.json`**
+- [x] **Step 2: Update `.devcontainer/devcontainer.json`**
 
 Change the `postCreateCommand` (drop `dotnet-ef`):
 
@@ -2596,11 +2596,11 @@ Change the `postCreateCommand` (drop `dotnet-ef`):
 
 (Leave the rest of the file unchanged; the `ms-ossdata.vscode-pgsql` extension can be removed from `extensions` since Postgres is gone.)
 
-- [ ] **Step 3: Document the Docker-daemon prerequisite for integration tests**
+- [x] **Step 3: Document the Docker-daemon prerequisite for integration tests**
 
 Add a short note to `.devcontainer/devcontainer.json` is not needed; instead document in `CLAUDE.md` (next step) that `test/Kafdoc.InfrastructureTest` needs a reachable Docker daemon (Testcontainers).
 
-- [ ] **Step 4: Rewrite the `## Overview`, `## Commands`, and remove the stale DB sections in `CLAUDE.md`**
+- [x] **Step 4: Rewrite the `## Overview`, `## Commands`, and remove the stale DB sections in `CLAUDE.md`**
 
 Replace the `## Overview` body (`TODO...`) with:
 
@@ -2632,13 +2632,13 @@ In `## Architecture`, replace the four bullet descriptions to match the new desi
 
 Delete the `### Database access from Blazor components` subsection entirely (no database). Delete the EF/Npgsql references in `### Central management` / `## Conventions` and the `dotnet-ef` mention.
 
-- [ ] **Step 5: Build and run the full suite (excluding the Docker-dependent project if no daemon)**
+- [x] **Step 5: Build and run the full suite (excluding the Docker-dependent project if no daemon)**
 
 Run: `dotnet build --no-restore -warnaserror`
 Then: `dotnet test --no-restore` (runs all projects; `Kafdoc.InfrastructureTest` needs Docker).
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add .devcontainer CLAUDE.md
@@ -2651,12 +2651,12 @@ git commit -m "chore: devcontainer Kafka broker and updated docs"
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Clean build with warnings as errors**
+- [x] **Step 1: Clean build with warnings as errors**
 
 Run: `dotnet build --no-restore -warnaserror`
 Expected: PASS, zero warnings.
 
-- [ ] **Step 2: Run the full test suite**
+- [x] **Step 2: Run the full test suite**
 
 Run: `dotnet test --no-restore`
 Expected: All projects PASS (Domain, Application, Web, Architecture, Infrastructure integration).
@@ -2671,7 +2671,7 @@ Expected: All projects PASS (Domain, Application, Web, Architecture, Infrastruct
 
 Expected: data visible end-to-end; no console errors.
 
-- [ ] **Step 4: Final commit (if any docs/tweaks from smoke testing)**
+- [x] **Step 4: Final commit (if any docs/tweaks from smoke testing)**
 
 ```bash
 git add -A
