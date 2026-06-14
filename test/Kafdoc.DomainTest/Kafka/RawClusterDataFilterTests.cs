@@ -127,7 +127,69 @@ public class RawClusterDataFilterTests
         var filter = new RawClusterDataFilter(new ClusterFilterOptions());
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>((Action)(() => filter.Apply(null!)));
+        Assert.Throws<ArgumentNullException>(() => filter.Apply(null!));
+    }
+
+    [Fact]
+    public void Apply_with_multiple_topic_prefixes_honors_all_of_them()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions { TopicPrefixes = ["qa.", "staging."] });
+        var raw = Raw(topics:
+        [
+            new RawTopic("qa.orders", 1),
+            new RawTopic("staging.orders", 1),
+            new RawTopic("dev.orders", 1),
+        ]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        Assert.Contains(result.Topics, t => string.Equals(t.Name, "qa.orders", StringComparison.Ordinal));
+        Assert.Contains(result.Topics, t => string.Equals(t.Name, "staging.orders", StringComparison.Ordinal));
+        Assert.DoesNotContain(result.Topics, t => string.Equals(t.Name, "dev.orders", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Apply_with_prefix_matching_nothing_yields_empty_topic_list()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions { TopicPrefixes = ["qa."] });
+        var raw = Raw(topics:
+        [
+            new RawTopic("dev.orders", 1),
+            new RawTopic("dev.payments", 1),
+        ]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        Assert.Empty(result.Topics);
+    }
+
+    [Fact]
+    public void Apply_keeps_group_with_empty_consumed_topics_when_all_consumed_topics_are_filtered_out()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions
+        {
+            TopicPrefixes = ["qa."],
+            GroupPrefixes = ["qa."],
+        });
+        var raw = Raw(groups:
+        [
+            new RawConsumerGroup("qa.readers", "Stable", 1, ["dev.orders"]),
+        ]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        var group = Assert.Single(result.ConsumerGroups);
+        Assert.Equal("qa.readers", group.GroupId);
+        Assert.Empty(group.ConsumedTopics);
     }
 
     [Fact]
