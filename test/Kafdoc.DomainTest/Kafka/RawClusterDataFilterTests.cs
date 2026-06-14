@@ -193,6 +193,21 @@ public class RawClusterDataFilterTests
     }
 
     [Fact]
+    public void Apply_matches_user_prefix_when_principal_has_no_type_prefix()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions { UserPrefixes = ["qa-"] });
+        var raw = Raw(scram: [new RawScramUser("qa-svc"), new RawScramUser("dev-svc")]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        Assert.Contains(result.ScramUsers, u => string.Equals(u.Principal, "qa-svc", StringComparison.Ordinal));
+        Assert.DoesNotContain(result.ScramUsers, u => string.Equals(u.Principal, "dev-svc", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Filtered_acl_referencing_a_dropped_topic_yields_no_edge()
     {
         // Arrange
