@@ -88,7 +88,13 @@ public sealed class ConfluentKafkaClusterReaderTests(ITestOutputHelper testOutpu
         await CommitOffsetAsync("payments-consumers", "payments");
     }
 
-    /// <summary>Registers a consumer group by committing an offset on a topic partition.</summary>
+    /// <summary>
+    /// Registers a consumer group by committing an offset on a topic partition. The first commit
+    /// lazily creates the internal <c>__consumer_offsets</c> topic; until the group coordinator has
+    /// loaded the partition the group maps to, the commit fails transiently with
+    /// <c>NOT_COORDINATOR</c>/<c>COORDINATOR_LOAD_IN_PROGRESS</c>, so it is retried until the
+    /// coordinator is ready or the timeout elapses.
+    /// </summary>
     private async Task CommitOffsetAsync(string groupId, string topic)
     {
         using var consumer = new ConsumerBuilder<Ignore, Ignore>(new ConsumerConfig
@@ -102,11 +108,29 @@ public sealed class ConfluentKafkaClusterReaderTests(ITestOutputHelper testOutpu
             EnableAutoCommit = false,
         }).Build();
 
-        consumer.Commit([new TopicPartitionOffset(topic, 0, new Offset(1))]);
-        consumer.Close();
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+        while (true)
+        {
+            try
+            {
+                consumer.Commit([new TopicPartitionOffset(topic, 0, new Offset(1))]);
+                break;
+            }
+            catch (KafkaException ex) when (IsTransientCoordinatorError(ex) && DateTime.UtcNow < deadline)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(250));
+            }
+        }
 
-        await Task.CompletedTask;
+        consumer.Close();
     }
+
+    /// <summary>Whether the error is a retriable coordinator error raised while the group
+    /// coordinator is still being elected or loading its <c>__consumer_offsets</c> partition.</summary>
+    private static bool IsTransientCoordinatorError(KafkaException ex) =>
+        ex.Error.Code is ErrorCode.NotCoordinatorForGroup
+            or ErrorCode.GroupLoadInProgress
+            or ErrorCode.GroupCoordinatorNotAvailable;
 
     [Fact]
     public async Task ReadAsync_returns_seeded_topic_acl_and_scram_user()
