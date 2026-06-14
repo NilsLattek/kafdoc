@@ -34,3 +34,8 @@ app.MapRazorComponents<App>()
 #pragma warning disable S6966 // Awaitable method should be used
 app.Run();
 #pragma warning restore S6966 // Awaitable method should be used
+
+#pragma warning disable S1118 // Top-level Program class used as assembly anchor for integration tests
+/// <summary>Exposes the implicit entry-point class so tests can anchor to the Web assembly.</summary>
+public partial class Program;
+#pragma warning restore S1118

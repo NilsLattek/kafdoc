@@ -1,0 +1,51 @@
+@page "/"
+@rendermode InteractiveServer
+@using Kafdoc.Application.Services
+@inject ITopicQueryService TopicQuery
+@inject ISnapshotStatusService Status
+
+<PageTitle>Topics</PageTitle>
+
+<h1>Topics</h1>
+
+<RefreshStatus />
+
+@if (!Status.GetStatus().IsReady)
+{
+    <p><em>Loading cluster data…</em></p>
+}
+else
+{
+    <input class="form-control mb-3" placeholder="Filter topics…" @bind="_filter" @bind:event="oninput" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Topic</th>
+                <th>Partitions</th>
+                <th>Producers</th>
+                <th>Consumer groups</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var topic in Filtered())
+            {
+                <tr>
+                    <td><a href="@($"/topics/{Uri.EscapeDataString(topic.Name)}")">@topic.Name</a></td>
+                    <td>@topic.PartitionCount</td>
+                    <td>@topic.ProducerCount</td>
+                    <td>@topic.ConsumerGroupCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string _filter = string.Empty;
+
+    private IEnumerable<Kafdoc.Application.Dtos.TopicSummaryDto> Filtered() =>
+        TopicQuery.GetTopics()
+            .Where(t => string.IsNullOrWhiteSpace(_filter)
+                || t.Name.Contains(_filter, StringComparison.OrdinalIgnoreCase));
+}

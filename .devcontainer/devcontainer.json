@@ -1,47 +1,41 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet-postgres
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
-  "name": "C# (.NET) and PostgreSQL",
+  "name": "Kafdoc (.NET) and secured Kafka",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "dockerDashComposeVersion": "none",
+      "installDockerBuildx": false,
+      "installDockerComposeSwitch": false
+    }
+  },
+  "containerEnv": {
+    "DOCKER_API_VERSION": "1.43",
+    // Published container ports are reachable via the bridge gateway, not this container's
+    // loopback. Point Testcontainers' host (Container.Hostname) at the host-gateway alias added
+    // in docker-compose.yml so bootstrap addresses and advertised listeners resolve correctly.
+    "TESTCONTAINERS_HOST_OVERRIDE": "host.docker.internal"
   },
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-dotnettools.csdevkit",
-        "ms-ossdata.vscode-pgsql",
-        "openai.chatgpt"
+        "ms-dotnettools.csdevkit"
       ],
       "settings": {
-        // "sqltools.connections": [
-        //   {
-        //     "name": "Container database",
-        //     "driver": "PostgreSQL",
-        //     "server": "localhost",
-        //     "port": 5432,
-        //     "database": "postgres",
-        //     "username": "postgres",
-        //     "password": "postgres"
-        //   }
-        // ],
         "editor.formatOnSave": true
       }
     }
-  },
+  }
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // "forwardPorts": [5000, 5001, 5432],
-  // "portsAttributes": {
-  //		"5001": {
-  //			"protocol": "https"
-  //		}
-  // }
-  // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "dotnet tool install --global dotnet-ef"
+  // "forwardPorts": [5000, 5001],
+  // Restore packages once the container is created.
+  // "postCreateCommand": "dotnet restore"
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
   // "remoteUser": "root"
 }

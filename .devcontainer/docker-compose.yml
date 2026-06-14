@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - kafka
 
     volumes:
       - ../..:/workspaces:cached
@@ -10,27 +12,57 @@ services:
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
-    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
-
+    # Lets Testcontainers reach broker ports it publishes on the (outside) Docker host.
+    # host-gateway resolves to the bridge gateway, which is how published ports are reachable
+    # from this container; TESTCONTAINERS_HOST_OVERRIDE (see devcontainer.json) points at it.
+    # NOTE: this is mutually exclusive with `network_mode: service:kafka` (Docker rejects
+    # custom host-to-IP mappings on a shared network namespace), so the app stays on the
+    # compose default network and reaches the dev broker by its service name `kafka:9092`.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     # user: root
 
-    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
-
-  db:
-    image: postgres:18.3
+  kafka:
+    image: apache/kafka:3.8.0
     restart: unless-stopped
-    volumes:
-      - postgres-data:/var/lib/postgresql/docker
+    # The stock image entrypoint formats storage but cannot seed a SCRAM credential, so the
+    # admin super-user would have nothing to authenticate against. Mirror the integration-test
+    # fixture (test/Kafdoc.InfrastructureTest/KafkaTest.cs): generate the config via the image's
+    # wrapper, then re-format the metadata log with --add-scram before starting the broker.
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        . /etc/kafka/docker/configureDefaults
+        . /etc/kafka/docker/configure
+        /opt/kafka/bin/kafka-run-class.sh kafka.docker.KafkaDockerWrapper setup \
+          --default-configs-dir /etc/kafka/docker \
+          --mounted-configs-dir /mnt/shared/config \
+          --final-configs-dir /opt/kafka/config
+        LOGDIR=$$(grep '^log.dirs' /opt/kafka/config/server.properties | cut -d= -f2)
+        LOGDIR=$${LOGDIR:-/tmp/kafka-logs}
+        rm -rf "$${LOGDIR:?}"/*
+        /opt/kafka/bin/kafka-storage.sh format -t "$$CLUSTER_ID" \
+          -c /opt/kafka/config/server.properties \
+          --add-scram "SCRAM-SHA-512=[name=admin,password=admin-secret]"
+        exec /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-
-    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
-
-volumes:
-  postgres-data:
+      CLUSTER_ID: "5L6g3nShT-eMCtK--X86sw"
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093"
+      KAFKA_LISTENERS: "SASL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "SASL://kafka:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "SASL:SASL_PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "SASL"
+      KAFKA_SASL_ENABLED_MECHANISMS: "SCRAM-SHA-512"
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: "SCRAM-SHA-512"
+      KAFKA_AUTHORIZER_CLASS_NAME: "org.apache.kafka.metadata.authorizer.StandardAuthorizer"
+      KAFKA_SUPER_USERS: "User:admin;User:ANONYMOUS"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_LISTENER_NAME_SASL_SCRAM-SHA-512_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required;"

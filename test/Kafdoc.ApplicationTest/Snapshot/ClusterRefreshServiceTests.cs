@@ -1,0 +1,57 @@
+using Microsoft.Extensions.Time.Testing;
+
+using NSubstitute;
+
+using Kafdoc.Application.Snapshot;
+using Kafdoc.Domain.Graph;
+using Kafdoc.Domain.Kafka;
+
+namespace Kafdoc.ApplicationTest.Snapshot;
+
+public class ClusterRefreshServiceTests
+{
+    private static RawClusterData EmptyRaw() => new([], [], [], []);
+
+    [Fact]
+    public async Task RefreshAsync_stores_snapshot_stamped_with_current_time()
+    {
+        // Arrange
+        var reader = Substitute.For<IKafkaClusterReader>();
+        reader.ReadAsync(Arg.Any<CancellationToken>()).Returns(EmptyRaw());
+        var store = new SnapshotStore();
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 6, 12, 8, 0, 0, TimeSpan.Zero));
+        var service = new ClusterRefreshService(reader, new ClusterGraphBuilder(), store, time);
+
+        // Act
+        var result = await service.RefreshAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(store.Current);
+        Assert.Equal(time.GetUtcNow(), store.Current!.CapturedAt);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_keeps_previous_snapshot_when_read_fails()
+    {
+        // Arrange
+        var reader = Substitute.For<IKafkaClusterReader>();
+        var store = new SnapshotStore();
+        var goodSnapshot = new ClusterSnapshot(
+            new ClusterGraph([], [], [], [], [], [], []),
+            new DateTimeOffset(2026, 6, 12, 7, 0, 0, TimeSpan.Zero));
+        store.SetSnapshot(goodSnapshot);
+        reader.ReadAsync(Arg.Any<CancellationToken>())
+            .Returns<RawClusterData>(_ => throw new InvalidOperationException("broker down"));
+        var service = new ClusterRefreshService(
+            reader, new ClusterGraphBuilder(), store, new FakeTimeProvider());
+
+        // Act
+        var result = await service.RefreshAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailed);
+        Assert.Same(goodSnapshot, store.Current);
+        Assert.NotNull(store.LastError);
+    }
+}
