@@ -1,0 +1,4 @@
+<Project>
+    <!-- Isolates the file-based seed script from the repo root build props (analyzers +
+         Central Package Management), which otherwise conflict with its inline #:package. -->
+</Project>

@@ -82,20 +82,26 @@ internal sealed class ConfluentKafkaClusterReader(
             .DescribeConsumerGroupsAsync(groupIds, new DescribeConsumerGroupsOptions { RequestTimeout = _timeout })
             .ConfigureAwait(false);
 
-        var offsets = await adminClient
-            .ListConsumerGroupOffsetsAsync(
-                groupIds.Select(id => new ConsumerGroupTopicPartitions(id, null)).ToList(),
-                new ListConsumerGroupOffsetsOptions { RequestTimeout = _timeout })
-            .ConfigureAwait(false);
+        // Confluent.Kafka's IAdminClient only supports listing offsets for one group per
+        // call ("Can only list offsets for one group at a time"), so query each separately.
+        var topicsByGroup = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal);
+        foreach (var groupId in groupIds)
+        {
+            var result = await adminClient
+                .ListConsumerGroupOffsetsAsync(
+                    [new ConsumerGroupTopicPartitions(groupId, null)],
+                    new ListConsumerGroupOffsetsOptions { RequestTimeout = _timeout })
+                .ConfigureAwait(false);
 
-        var topicsByGroup = offsets.ToDictionary(
-            o => o.Group,
-            o => (IReadOnlyList<string>)o.Partitions
-                .Where(p => p.Offset != Offset.Unset)
-                .Select(p => p.TopicPartition.Topic)
-                .Distinct(StringComparer.Ordinal)
-                .ToList(),
-            StringComparer.Ordinal);
+            foreach (var offsets in result)
+            {
+                topicsByGroup[offsets.Group] = offsets.Partitions
+                    .Where(p => p.Offset != Offset.Unset)
+                    .Select(p => p.TopicPartition.Topic)
+                    .Distinct(StringComparer.Ordinal)
+                    .ToList();
+            }
+        }
 
         return described.ConsumerGroupDescriptions
             .Select(d => new RawConsumerGroup(
