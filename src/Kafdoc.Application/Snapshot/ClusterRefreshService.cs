@@ -5,9 +5,10 @@ using Kafdoc.Domain.Kafka;
 
 namespace Kafdoc.Application.Snapshot;
 
-/// <summary>Default <see cref="IClusterRefreshService"/>: reader → builder → store swap.</summary>
+/// <summary>Default <see cref="IClusterRefreshService"/>: reader → filter → builder → store swap.</summary>
 internal sealed class ClusterRefreshService(
     IKafkaClusterReader reader,
+    RawClusterDataFilter filter,
     ClusterGraphBuilder builder,
     ISnapshotStore store,
     TimeProvider timeProvider) : IClusterRefreshService
@@ -17,7 +18,7 @@ internal sealed class ClusterRefreshService(
     {
         try
         {
-            var raw = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+            var raw = filter.Apply(await reader.ReadAsync(cancellationToken).ConfigureAwait(false));
             var graph = builder.Build(raw);
             store.SetSnapshot(new ClusterSnapshot(graph, timeProvider.GetUtcNow()));
             return Result.Ok();

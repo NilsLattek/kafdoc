@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+using Kafdoc.Domain.Kafka;
 
 namespace Kafdoc.Domain;
 
@@ -15,6 +18,11 @@ public static class Configuration
     /// <param name="configuration">The application configuration.</param>
     public static void ConfigureDomain(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<ClusterFilterOptions>()
+            .Bind(configuration.GetSection(ClusterFilterOptions.SectionName));
+        services.AddSingleton(sp => sp.GetRequiredService<IOptions<ClusterFilterOptions>>().Value);
+
+        services.AddSingleton<RawClusterDataFilter>();
         services.AddSingleton<Kafdoc.Domain.Graph.ClusterGraphBuilder>();
     }
 }
