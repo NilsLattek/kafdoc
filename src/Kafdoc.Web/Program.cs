@@ -3,6 +3,8 @@ using Kafdoc.Infrastructure;
 using Kafdoc.Application;
 using Kafdoc.Domain;
 
+using Markdig;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,6 +14,10 @@ builder.Services.AddRazorComponents()
 builder.Services.ConfigureInfrastructure(builder.Configuration);
 builder.Services.ConfigureDomain(builder.Configuration);
 builder.Services.ConfigureApplication(builder.Configuration);
+builder.Services.AddSingleton(new MarkdownPipelineBuilder()
+    .UseAdvancedExtensions()
+    .DisableHtml()
+    .Build());
 
 var app = builder.Build();
 

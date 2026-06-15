@@ -1,11 +1,12 @@
 using Kafdoc.Application.Dtos;
 using Kafdoc.Application.Snapshot;
+using Kafdoc.Domain.Documentation;
 using Kafdoc.Domain.Graph;
 
 namespace Kafdoc.Application.Services;
 
 /// <summary>Computes user (principal) views from the current snapshot.</summary>
-internal sealed class UserQueryService(ISnapshotStore store) : IUserQueryService
+internal sealed class UserQueryService(ISnapshotStore store, IDocumentationStore documentation) : IUserQueryService
 {
     /// <inheritdoc />
     public IReadOnlyList<UserSummaryDto> GetUsers()
@@ -18,6 +19,7 @@ internal sealed class UserQueryService(ISnapshotStore store) : IUserQueryService
 
         var produces = Counts(graph.Producers.Select(p => (p.Principal, p.Topic)));
         var consumes = Counts(graph.Consumers.Select(c => (c.Principal, c.Topic)));
+        var docSlugs = documentation.ListSlugs(DocumentationKind.User);
 
         return graph.Users
             .OrderBy(u => u.Principal, StringComparer.Ordinal)
@@ -25,7 +27,8 @@ internal sealed class UserQueryService(ISnapshotStore store) : IUserQueryService
                 u.Principal,
                 u.HasScramCredentials,
                 produces.GetValueOrDefault(u.Principal),
-                consumes.GetValueOrDefault(u.Principal)))
+                consumes.GetValueOrDefault(u.Principal),
+                docSlugs.Contains(DocumentationSlug.ForUser(u.Principal))))
             .ToList();
     }
 
@@ -39,12 +42,16 @@ internal sealed class UserQueryService(ISnapshotStore store) : IUserQueryService
             return null;
         }
 
+        var doc = documentation.Read(DocumentationKind.User, principal);
+
         return new UserDetailDto(
             user.Principal,
             user.HasScramCredentials,
             DistinctSorted(graph.Producers.Where(p => Eq(p.Principal, principal)).Select(p => p.Topic)),
             DistinctSorted(graph.Consumers.Where(c => Eq(c.Principal, principal)).Select(c => c.Topic)),
-            DistinctSorted(graph.UserGroups.Where(g => Eq(g.Principal, principal)).Select(g => g.GroupId)));
+            DistinctSorted(graph.UserGroups.Where(g => Eq(g.Principal, principal)).Select(g => g.GroupId)),
+            doc.RelativePath,
+            doc.Content);
     }
 
     private static bool Eq(string a, string b) => string.Equals(a, b, StringComparison.Ordinal);

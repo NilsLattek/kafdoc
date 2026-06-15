@@ -5,4 +5,5 @@ namespace Kafdoc.Application.Dtos;
 /// <param name="PartitionCount">The number of partitions.</param>
 /// <param name="ProducerCount">The number of distinct producing principals.</param>
 /// <param name="ConsumerGroupCount">The number of consumer groups consuming the topic.</param>
-public sealed record TopicSummaryDto(string Name, int PartitionCount, int ProducerCount, int ConsumerGroupCount);
+/// <param name="HasDocumentation">Whether a documentation file exists for the topic.</param>
+public sealed record TopicSummaryDto(string Name, int PartitionCount, int ProducerCount, int ConsumerGroupCount, bool HasDocumentation);

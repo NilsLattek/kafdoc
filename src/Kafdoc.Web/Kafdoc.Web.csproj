@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Markdig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Kafdoc.Application/Kafdoc.Application.csproj" />
     <ProjectReference Include="../Kafdoc.Infrastructure/Kafdoc.Infrastructure.csproj" />
   </ItemGroup>

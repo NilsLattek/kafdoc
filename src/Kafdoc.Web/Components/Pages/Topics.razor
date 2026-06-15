@@ -25,6 +25,7 @@ else
                 <th>Partitions</th>
                 <th>Producers</th>
                 <th>Consumer groups</th>
+                <th>Docs</th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +36,7 @@ else
                     <td>@topic.PartitionCount</td>
                     <td>@topic.ProducerCount</td>
                     <td>@topic.ConsumerGroupCount</td>
+                    <td>@(topic.HasDocumentation ? "✓" : "—")</td>
                 </tr>
             }
         </tbody>

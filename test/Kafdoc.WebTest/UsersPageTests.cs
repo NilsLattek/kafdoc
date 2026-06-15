@@ -19,7 +19,7 @@ public sealed class UsersPageTests : Bunit.BunitContext
         var userQuery = Substitute.For<IUserQueryService>();
         userQuery.GetUsers().Returns(
         [
-            new UserSummaryDto("User:alice", HasScramCredentials: true, ProducesCount: 2, ConsumesCount: 1),
+            new UserSummaryDto("User:alice", HasScramCredentials: true, ProducesCount: 2, ConsumesCount: 1, HasDocumentation: true),
         ]);
         var status = Substitute.For<ISnapshotStatusService>();
         status.GetStatus().Returns(new SnapshotStatusDto(IsReady: true, LastRefresh: DateTimeOffset.UnixEpoch, LastError: null));
@@ -31,5 +31,6 @@ public sealed class UsersPageTests : Bunit.BunitContext
 
         // Assert
         Assert.Contains("href=\"/users/User%3Aalice\"", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("✓", cut.Markup, StringComparison.Ordinal);
     }
 }

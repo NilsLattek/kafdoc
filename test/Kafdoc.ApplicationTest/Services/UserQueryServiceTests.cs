@@ -1,6 +1,9 @@
 using Kafdoc.Application.Services;
 using Kafdoc.Application.Snapshot;
+using Kafdoc.Domain.Documentation;
 using Kafdoc.Domain.Graph;
+
+using NSubstitute;
 
 namespace Kafdoc.ApplicationTest.Services;
 
@@ -13,11 +16,20 @@ public class UserQueryServiceTests
         return store;
     }
 
+    private static IDocumentationStore NoDocs()
+    {
+        var docs = Substitute.For<IDocumentationStore>();
+        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
+        docs.Read(Arg.Any<DocumentationKind>(), Arg.Any<string>())
+            .Returns(ci => new DocumentationLookup($"users/{ci.ArgAt<string>(1)}.md", null));
+        return docs;
+    }
+
     [Fact]
     public void GetUsers_returns_empty_when_no_snapshot()
     {
         // Arrange
-        var service = new UserQueryService(new SnapshotStore());
+        var service = new UserQueryService(new SnapshotStore(), NoDocs());
 
         // Act
         var users = service.GetUsers();
@@ -38,7 +50,7 @@ public class UserQueryServiceTests
             Consumers: [new ConsumerEdge("User:c", "orders")],
             UserGroups: [],
             GroupConsumption: []);
-        var service = new UserQueryService(StoreWith(graph));
+        var service = new UserQueryService(StoreWith(graph), NoDocs());
 
         // Act
         var users = service.GetUsers();
@@ -60,7 +72,7 @@ public class UserQueryServiceTests
     {
         // Arrange
         var service = new UserQueryService(StoreWith(
-            new ClusterGraph([], [], [], [], [], [], [])));
+            new ClusterGraph([], [], [], [], [], [], [])), NoDocs());
 
         // Act + Assert
         Assert.Null(service.GetUser("User:missing"));
@@ -78,7 +90,7 @@ public class UserQueryServiceTests
             Consumers: [new ConsumerEdge("User:c", "orders")],
             UserGroups: [new UserGroupEdge("User:c", "g1")],
             GroupConsumption: [new GroupTopicEdge("g1", "orders")]);
-        var service = new UserQueryService(StoreWith(graph));
+        var service = new UserQueryService(StoreWith(graph), NoDocs());
 
         // Act
         var detail = service.GetUser("User:c");
@@ -88,5 +100,46 @@ public class UserQueryServiceTests
         Assert.Empty(detail!.ProducesTopics);
         Assert.Equal(["orders"], detail.ConsumesTopics);
         Assert.Equal(["g1"], detail.Groups);
+    }
+
+    [Fact]
+    public void GetUsers_sets_HasDocumentation_from_the_doc_store()
+    {
+        // Arrange
+        var graph = new ClusterGraph(
+            Topics: [],
+            Users: [new KafkaUser("User:documented", false), new KafkaUser("User:bare", false)],
+            ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
+        var docs = Substitute.For<IDocumentationStore>();
+        docs.ListSlugs(DocumentationKind.User).Returns(new HashSet<string>(StringComparer.Ordinal) { "documented" });
+        var service = new UserQueryService(StoreWith(graph), docs);
+
+        // Act
+        var users = service.GetUsers();
+
+        // Assert — ordered by principal: "User:bare" then "User:documented"
+        Assert.False(users[0].HasDocumentation);
+        Assert.True(users[1].HasDocumentation);
+    }
+
+    [Fact]
+    public void GetUser_includes_documentation_content_and_path()
+    {
+        // Arrange
+        var graph = new ClusterGraph(
+            Topics: [], Users: [new KafkaUser("User:c", false)],
+            ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
+        var docs = Substitute.For<IDocumentationStore>();
+        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
+        docs.Read(DocumentationKind.User, "User:c").Returns(new DocumentationLookup("users/c.md", "# hello"));
+        var service = new UserQueryService(StoreWith(graph), docs);
+
+        // Act
+        var detail = service.GetUser("User:c");
+
+        // Assert
+        Assert.NotNull(detail);
+        Assert.Equal("users/c.md", detail!.DocumentationPath);
+        Assert.Equal("# hello", detail.Documentation);
     }
 }

@@ -5,4 +5,5 @@ namespace Kafdoc.Application.Dtos;
 /// <param name="HasScramCredentials">Whether the principal has SCRAM credentials.</param>
 /// <param name="ProducesCount">Number of topics the principal may produce to.</param>
 /// <param name="ConsumesCount">Number of topics the principal may consume.</param>
-public sealed record UserSummaryDto(string Principal, bool HasScramCredentials, int ProducesCount, int ConsumesCount);
+/// <param name="HasDocumentation">Whether a documentation file exists for the user.</param>
+public sealed record UserSummaryDto(string Principal, bool HasScramCredentials, int ProducesCount, int ConsumesCount, bool HasDocumentation);

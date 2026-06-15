@@ -1,0 +1,25 @@
+@inject Markdig.MarkdownPipeline Pipeline
+
+<div class="documentation">
+    @if (Markdown is null)
+    {
+        <p><em>No additional information available.</em></p>
+        <p class="doc-source">Create <code>@Path</code> to add documentation.</p>
+    }
+    else
+    {
+        <div class="doc-body">@((MarkupString)Markdig.Markdown.ToHtml(Markdown, Pipeline))</div>
+        <p class="doc-source">Source: <code>@Path</code></p>
+    }
+</div>
+
+@code {
+    /// <summary>The raw markdown to render, or <c>null</c> when no file exists.</summary>
+    [Parameter]
+    public string? Markdown { get; set; }
+
+    /// <summary>The expected file path, always shown so authors know what to name a new file.</summary>
+    [Parameter]
+    [EditorRequired]
+    public string Path { get; set; } = string.Empty;
+}
