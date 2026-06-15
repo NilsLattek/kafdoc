@@ -1,11 +1,12 @@
 using Kafdoc.Application.Dtos;
 using Kafdoc.Application.Snapshot;
+using Kafdoc.Domain.Documentation;
 using Kafdoc.Domain.Graph;
 
 namespace Kafdoc.Application.Services;
 
 /// <summary>Computes topic views from the current snapshot.</summary>
-internal sealed class TopicQueryService(ISnapshotStore store) : ITopicQueryService
+internal sealed class TopicQueryService(ISnapshotStore store, IDocumentationStore documentation) : ITopicQueryService
 {
     /// <inheritdoc />
     public IReadOnlyList<TopicSummaryDto> GetTopics()
@@ -24,13 +25,16 @@ internal sealed class TopicQueryService(ISnapshotStore store) : ITopicQueryServi
             .GroupBy(e => e.Topic, StringComparer.Ordinal)
             .ToDictionary(g => g.Key, g => g.Select(e => e.GroupId).Distinct(StringComparer.Ordinal).Count(), StringComparer.Ordinal);
 
+        var docSlugs = documentation.ListSlugs(DocumentationKind.Topic);
+
         return graph.Topics
             .OrderBy(t => t.Name, StringComparer.Ordinal)
             .Select(t => new TopicSummaryDto(
                 t.Name,
                 t.PartitionCount,
                 producersByTopic.GetValueOrDefault(t.Name),
-                groupsByTopic.GetValueOrDefault(t.Name)))
+                groupsByTopic.GetValueOrDefault(t.Name),
+                docSlugs.Contains(DocumentationSlug.ForTopic(t.Name))))
             .ToList();
     }
 
@@ -84,6 +88,8 @@ internal sealed class TopicQueryService(ISnapshotStore store) : ITopicQueryServi
             .OrderBy(p => p, StringComparer.Ordinal)
             .ToList();
 
-        return new TopicDetailDto(topic.Name, topic.PartitionCount, producers, consumerGroups, readOnlyPrincipals);
+        var doc = documentation.Read(DocumentationKind.Topic, name);
+
+        return new TopicDetailDto(topic.Name, topic.PartitionCount, producers, consumerGroups, readOnlyPrincipals, doc.RelativePath, doc.Content);
     }
 }

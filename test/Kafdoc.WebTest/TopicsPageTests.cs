@@ -36,8 +36,8 @@ public sealed class TopicsPageTests : Bunit.BunitContext
         var topicQuery = Substitute.For<ITopicQueryService>();
         topicQuery.GetTopics().Returns(
         [
-            new TopicSummaryDto("orders", 3, 1, 2),
-            new TopicSummaryDto("billing", 1, 0, 1),
+            new TopicSummaryDto("orders", 3, 1, 2, HasDocumentation: true),
+            new TopicSummaryDto("billing", 1, 0, 1, HasDocumentation: false),
         ]);
         var status = Substitute.For<ISnapshotStatusService>();
         status.GetStatus().Returns(new SnapshotStatusDto(IsReady: true, LastRefresh: DateTimeOffset.UnixEpoch, LastError: null));
@@ -50,5 +50,6 @@ public sealed class TopicsPageTests : Bunit.BunitContext
         // Assert
         Assert.Contains("orders", cut.Markup, StringComparison.Ordinal);
         Assert.Contains("billing", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("✓", cut.Markup, StringComparison.Ordinal);
     }
 }

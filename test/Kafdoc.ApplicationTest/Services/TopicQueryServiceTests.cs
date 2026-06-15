@@ -1,6 +1,9 @@
 using Kafdoc.Application.Services;
 using Kafdoc.Application.Snapshot;
+using Kafdoc.Domain.Documentation;
 using Kafdoc.Domain.Graph;
+
+using NSubstitute;
 
 namespace Kafdoc.ApplicationTest.Services;
 
@@ -13,11 +16,20 @@ public class TopicQueryServiceTests
         return store;
     }
 
+    private static IDocumentationStore NoDocs()
+    {
+        var docs = Substitute.For<IDocumentationStore>();
+        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
+        docs.Read(Arg.Any<DocumentationKind>(), Arg.Any<string>())
+            .Returns(ci => new DocumentationLookup($"topics/{ci.ArgAt<string>(1)}.md", null));
+        return docs;
+    }
+
     [Fact]
     public void GetTopics_returns_empty_when_no_snapshot()
     {
         // Arrange
-        var service = new TopicQueryService(new SnapshotStore());
+        var service = new TopicQueryService(new SnapshotStore(), NoDocs());
 
         // Act
         var topics = service.GetTopics();
@@ -38,7 +50,7 @@ public class TopicQueryServiceTests
             Consumers: [],
             UserGroups: [],
             GroupConsumption: [new GroupTopicEdge("g1", "orders")]);
-        var service = new TopicQueryService(StoreWith(graph));
+        var service = new TopicQueryService(StoreWith(graph), NoDocs());
 
         // Act
         var topic = Assert.Single(service.GetTopics());
@@ -54,7 +66,7 @@ public class TopicQueryServiceTests
     {
         // Arrange
         var service = new TopicQueryService(StoreWith(
-            new ClusterGraph([], [], [], [], [], [], [])));
+            new ClusterGraph([], [], [], [], [], [], [])), NoDocs());
 
         // Act + Assert
         Assert.Null(service.GetTopic("missing"));
@@ -72,7 +84,7 @@ public class TopicQueryServiceTests
             Consumers: [new ConsumerEdge("User:c", "orders"), new ConsumerEdge("User:r", "orders")],
             UserGroups: [new UserGroupEdge("User:c", "g1")],
             GroupConsumption: [new GroupTopicEdge("g1", "orders")]);
-        var service = new TopicQueryService(StoreWith(graph));
+        var service = new TopicQueryService(StoreWith(graph), NoDocs());
 
         // Act
         var detail = service.GetTopic("orders");
@@ -84,5 +96,45 @@ public class TopicQueryServiceTests
         Assert.Equal("g1", group.GroupId);
         Assert.Equal(["User:c"], group.Principals);
         Assert.Equal(["User:r"], detail.ReadOnlyPrincipals);
+    }
+
+    [Fact]
+    public void GetTopics_sets_HasDocumentation_from_the_doc_store()
+    {
+        // Arrange
+        var graph = new ClusterGraph(
+            Topics: [new KafkaTopic("documented", 1), new KafkaTopic("bare", 1)],
+            Users: [], ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
+        var docs = Substitute.For<IDocumentationStore>();
+        docs.ListSlugs(DocumentationKind.Topic).Returns(new HashSet<string>(StringComparer.Ordinal) { "documented" });
+        var service = new TopicQueryService(StoreWith(graph), docs);
+
+        // Act
+        var topics = service.GetTopics();
+
+        // Assert — ordered by name: "bare" then "documented"
+        Assert.False(topics[0].HasDocumentation);
+        Assert.True(topics[1].HasDocumentation);
+    }
+
+    [Fact]
+    public void GetTopic_includes_documentation_content_and_path()
+    {
+        // Arrange
+        var graph = new ClusterGraph(
+            Topics: [new KafkaTopic("orders.placed", 1)],
+            Users: [], ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
+        var docs = Substitute.For<IDocumentationStore>();
+        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
+        docs.Read(DocumentationKind.Topic, "orders.placed").Returns(new DocumentationLookup("topics/orders.placed.md", "# Orders"));
+        var service = new TopicQueryService(StoreWith(graph), docs);
+
+        // Act
+        var detail = service.GetTopic("orders.placed");
+
+        // Assert
+        Assert.NotNull(detail);
+        Assert.Equal("topics/orders.placed.md", detail!.DocumentationPath);
+        Assert.Equal("# Orders", detail.Documentation);
     }
 }

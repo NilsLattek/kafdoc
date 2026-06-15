@@ -18,7 +18,7 @@ else
 {
     <table class="table">
         <thead>
-            <tr><th>Principal</th><th>SCRAM</th><th>Produces</th><th>Consumes</th></tr>
+            <tr><th>Principal</th><th>SCRAM</th><th>Produces</th><th>Consumes</th><th>Docs</th></tr>
         </thead>
         <tbody>
             @foreach (var u in UserQuery.GetUsers())
@@ -28,6 +28,7 @@ else
                     <td>@(u.HasScramCredentials ? "yes" : "—")</td>
                     <td>@u.ProducesCount</td>
                     <td>@u.ConsumesCount</td>
+                    <td>@(u.HasDocumentation ? "✓" : "—")</td>
                 </tr>
             }
         </tbody>

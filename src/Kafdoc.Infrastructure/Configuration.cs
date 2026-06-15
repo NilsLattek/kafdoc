@@ -4,7 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
+using Kafdoc.Domain.Documentation;
 using Kafdoc.Domain.Kafka;
+using Kafdoc.Infrastructure.Documentation;
 using Kafdoc.Infrastructure.Kafka;
 
 namespace Kafdoc.Infrastructure;
@@ -36,6 +38,10 @@ public static class Configuration
             };
             return new AdminClientBuilder(config).Build();
         });
+
+        services.AddOptions<DocumentationOptions>()
+            .Bind(configuration.GetSection(DocumentationOptions.SectionName));
+        services.AddSingleton<IDocumentationStore, FileDocumentationStore>();
 
         services.AddSingleton<IKafkaClusterReader, ConfluentKafkaClusterReader>();
     }
