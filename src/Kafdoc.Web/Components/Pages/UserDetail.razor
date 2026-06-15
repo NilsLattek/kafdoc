@@ -1,0 +1,59 @@
+@page "/users/{Principal}"
+@rendermode InteractiveServer
+@using Kafdoc.Application.Services
+@inject IUserQueryService UserQuery
+
+<PageTitle>User: @Principal</PageTitle>
+
+<p><a href="/users">&larr; All users</a></p>
+
+@{
+    var detail = UserQuery.GetUser(Principal);
+}
+
+@if (detail is null)
+{
+    <h1>User not found</h1>
+    <p>No principal named <code>@Principal</code> in the current snapshot.</p>
+}
+else
+{
+    <h1>@detail.Principal</h1>
+    <p>SCRAM: @(detail.HasScramCredentials ? "yes" : "—")</p>
+
+    <h2>Produces</h2>
+    @if (detail.ProducesTopics.Count == 0)
+    {
+        <p><em>No producer ACLs.</em></p>
+    }
+    else
+    {
+        <ul>
+            @foreach (var topic in detail.ProducesTopics)
+            {
+                <li><a href="@($"/topics/{Uri.EscapeDataString(topic)}")">@topic</a></li>
+            }
+        </ul>
+    }
+
+    <h2>Consumes</h2>
+    @if (detail.ConsumesTopics.Count == 0)
+    {
+        <p><em>No consumer ACLs.</em></p>
+    }
+    else
+    {
+        <ul>
+            @foreach (var topic in detail.ConsumesTopics)
+            {
+                <li><a href="@($"/topics/{Uri.EscapeDataString(topic)}")">@topic</a></li>
+            }
+        </ul>
+    }
+}
+
+@code {
+    /// <summary>The principal from the route.</summary>
+    [Parameter]
+    public string Principal { get; set; } = string.Empty;
+}

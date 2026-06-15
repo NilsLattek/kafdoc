@@ -55,7 +55,7 @@ dotnet test --no-restore test/Kafdoc.InfrastructureTest
 
 ## Versioning
 
-Do not perform any git commit actions on the main branch. Always use feature branches!
+Do not perform any git actions! I will review the code and perform git actions myself.
 
 ## Architecture
 

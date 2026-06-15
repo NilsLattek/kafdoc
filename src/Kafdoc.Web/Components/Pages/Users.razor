@@ -24,7 +24,7 @@ else
             @foreach (var u in UserQuery.GetUsers())
             {
                 <tr>
-                    <td>@u.Principal</td>
+                    <td><a href="@($"/users/{Uri.EscapeDataString(u.Principal)}")">@u.Principal</a></td>
                     <td>@(u.HasScramCredentials ? "yes" : "—")</td>
                     <td>@u.ProducesCount</td>
                     <td>@u.ConsumesCount</td>
