@@ -11,7 +11,7 @@ namespace Kafdoc.WebTest;
 public sealed class MarkdownContentTests : Bunit.BunitContext
 {
     private void RegisterPipeline() =>
-        Services.AddSingleton(new MarkdownPipelineBuilder().UseAdvancedExtensions().DisableHtml().Build());
+        Services.AddSingleton(new MarkdownPipelineBuilder().UseAdvancedExtensions().UseYamlFrontMatter().DisableHtml().Build());
 
     [Fact]
     public void Renders_markdown_as_html_with_a_source_caption()
@@ -59,5 +59,23 @@ public sealed class MarkdownContentTests : Bunit.BunitContext
 
         // Assert — DisableHtml escapes the tag instead of emitting it
         Assert.DoesNotContain("<script>", cut.Markup, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Does_not_render_the_yaml_front_matter_block()
+    {
+        // Arrange
+        RegisterPipeline();
+        const string markdown = "---\ntopics:\n  - orders.*.placed\n---\n# Orders placed\n";
+
+        // Act
+        var cut = Render<MarkdownContent>(ps => ps
+            .Add(p => p.Markdown, markdown)
+            .Add(p => p.Path, "topics/orders-shared.md"));
+
+        // Assert — the front-matter keys are omitted; the heading renders
+        Assert.DoesNotContain("orders.*.placed", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("<h1", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("Orders placed", cut.Markup, StringComparison.Ordinal);
     }
 }

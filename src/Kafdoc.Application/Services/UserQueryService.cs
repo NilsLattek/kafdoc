@@ -19,7 +19,6 @@ internal sealed class UserQueryService(ISnapshotStore store, IDocumentationStore
 
         var produces = Counts(graph.Producers.Select(p => (p.Principal, p.Topic)));
         var consumes = Counts(graph.Consumers.Select(c => (c.Principal, c.Topic)));
-        var docSlugs = documentation.ListSlugs(DocumentationKind.User);
 
         return graph.Users
             .OrderBy(u => u.Principal, StringComparer.Ordinal)
@@ -28,7 +27,7 @@ internal sealed class UserQueryService(ISnapshotStore store, IDocumentationStore
                 u.HasScramCredentials,
                 produces.GetValueOrDefault(u.Principal),
                 consumes.GetValueOrDefault(u.Principal),
-                docSlugs.Contains(DocumentationSlug.ForUser(u.Principal))))
+                documentation.HasDocumentation(DocumentationKind.User, u.Principal)))
             .ToList();
     }
 

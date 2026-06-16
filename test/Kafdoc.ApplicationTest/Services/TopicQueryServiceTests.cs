@@ -19,7 +19,7 @@ public class TopicQueryServiceTests
     private static IDocumentationStore NoDocs()
     {
         var docs = Substitute.For<IDocumentationStore>();
-        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
+        docs.HasDocumentation(Arg.Any<DocumentationKind>(), Arg.Any<string>()).Returns(false);
         docs.Read(Arg.Any<DocumentationKind>(), Arg.Any<string>())
             .Returns(ci => new DocumentationLookup($"topics/{ci.ArgAt<string>(1)}.md", null));
         return docs;
@@ -106,7 +106,8 @@ public class TopicQueryServiceTests
             Topics: [new KafkaTopic("documented", 1), new KafkaTopic("bare", 1)],
             Users: [], ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
         var docs = Substitute.For<IDocumentationStore>();
-        docs.ListSlugs(DocumentationKind.Topic).Returns(new HashSet<string>(StringComparer.Ordinal) { "documented" });
+        docs.HasDocumentation(DocumentationKind.Topic, Arg.Any<string>()).Returns(false);
+        docs.HasDocumentation(DocumentationKind.Topic, "documented").Returns(true);
         var service = new TopicQueryService(StoreWith(graph), docs);
 
         // Act
@@ -125,7 +126,6 @@ public class TopicQueryServiceTests
             Topics: [new KafkaTopic("orders.placed", 1)],
             Users: [], ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
         var docs = Substitute.For<IDocumentationStore>();
-        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
         docs.Read(DocumentationKind.Topic, "orders.placed").Returns(new DocumentationLookup("topics/orders.placed.md", "# Orders"));
         var service = new TopicQueryService(StoreWith(graph), docs);
 

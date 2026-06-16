@@ -25,8 +25,6 @@ internal sealed class TopicQueryService(ISnapshotStore store, IDocumentationStor
             .GroupBy(e => e.Topic, StringComparer.Ordinal)
             .ToDictionary(g => g.Key, g => g.Select(e => e.GroupId).Distinct(StringComparer.Ordinal).Count(), StringComparer.Ordinal);
 
-        var docSlugs = documentation.ListSlugs(DocumentationKind.Topic);
-
         return graph.Topics
             .OrderBy(t => t.Name, StringComparer.Ordinal)
             .Select(t => new TopicSummaryDto(
@@ -34,7 +32,7 @@ internal sealed class TopicQueryService(ISnapshotStore store, IDocumentationStor
                 t.PartitionCount,
                 producersByTopic.GetValueOrDefault(t.Name),
                 groupsByTopic.GetValueOrDefault(t.Name),
-                docSlugs.Contains(DocumentationSlug.ForTopic(t.Name))))
+                documentation.HasDocumentation(DocumentationKind.Topic, t.Name)))
             .ToList();
     }
 
