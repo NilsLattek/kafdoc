@@ -9,8 +9,9 @@ public interface IDocumentationStore
     /// <returns>The lookup; <see cref="DocumentationLookup.Content"/> is <c>null</c> when no file exists.</returns>
     DocumentationLookup Read(DocumentationKind kind, string name);
 
-    /// <summary>Lists the slugs that currently have a documentation file on disk.</summary>
-    /// <param name="kind">Whether to list topic or user docs.</param>
-    /// <returns>Slugs (file names without extension) present in the relevant folder.</returns>
-    IReadOnlySet<string> ListSlugs(DocumentationKind kind);
+    /// <summary>Indicates whether the name resolves to a documentation file (own slug or alias).</summary>
+    /// <param name="kind">Whether the name is a topic or a user.</param>
+    /// <param name="name">The topic name or principal.</param>
+    /// <returns><c>true</c> when documentation exists; an index lookup with no content load.</returns>
+    bool HasDocumentation(DocumentationKind kind, string name);
 }

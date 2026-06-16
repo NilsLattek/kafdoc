@@ -13,6 +13,19 @@
   "enabledMcpjsonServers": [
     "mslearn"
   ],
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "csharp-lsp@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "dotnet@dotnet-agent-skills": true,
+    "dotnet-aspnet@dotnet-agent-skills": true,
+    "dotnet-blazor@dotnet-agent-skills": true,
+    "dotnet-data@dotnet-agent-skills": true,
+    "dotnet-diag@dotnet-agent-skills": true,
+    "dotnet-msbuild@dotnet-agent-skills": true,
+    "dotnet-nuget@dotnet-agent-skills": true,
+    "dotnet-test@dotnet-agent-skills": true
+  },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
       "source": {
@@ -27,18 +40,5 @@
       },
       "autoUpdate": true
     }
-  },
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
-    "csharp-lsp@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "dotnet@dotnet-agent-skills": true,
-    "dotnet-aspnet@dotnet-agent-skills": true,
-    "dotnet-blazor@dotnet-agent-skills": true,
-    "dotnet-data@dotnet-agent-skills": true,
-    "dotnet-diag@dotnet-agent-skills": true,
-    "dotnet-msbuild@dotnet-agent-skills": true,
-    "dotnet-nuget@dotnet-agent-skills": true,
-    "dotnet-test@dotnet-agent-skills": true
   }
 }

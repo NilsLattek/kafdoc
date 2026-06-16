@@ -16,6 +16,7 @@ builder.Services.ConfigureDomain(builder.Configuration);
 builder.Services.ConfigureApplication(builder.Configuration);
 builder.Services.AddSingleton(new MarkdownPipelineBuilder()
     .UseAdvancedExtensions()
+    .UseYamlFrontMatter()
     .DisableHtml()
     .Build());
 

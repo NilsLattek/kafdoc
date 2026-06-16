@@ -19,7 +19,7 @@ public class UserQueryServiceTests
     private static IDocumentationStore NoDocs()
     {
         var docs = Substitute.For<IDocumentationStore>();
-        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
+        docs.HasDocumentation(Arg.Any<DocumentationKind>(), Arg.Any<string>()).Returns(false);
         docs.Read(Arg.Any<DocumentationKind>(), Arg.Any<string>())
             .Returns(ci => new DocumentationLookup($"users/{ci.ArgAt<string>(1)}.md", null));
         return docs;
@@ -111,7 +111,8 @@ public class UserQueryServiceTests
             Users: [new KafkaUser("User:documented", false), new KafkaUser("User:bare", false)],
             ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
         var docs = Substitute.For<IDocumentationStore>();
-        docs.ListSlugs(DocumentationKind.User).Returns(new HashSet<string>(StringComparer.Ordinal) { "documented" });
+        docs.HasDocumentation(DocumentationKind.User, Arg.Any<string>()).Returns(false);
+        docs.HasDocumentation(DocumentationKind.User, "User:documented").Returns(true);
         var service = new UserQueryService(StoreWith(graph), docs);
 
         // Act
@@ -130,7 +131,6 @@ public class UserQueryServiceTests
             Topics: [], Users: [new KafkaUser("User:c", false)],
             ConsumerGroups: [], Producers: [], Consumers: [], UserGroups: [], GroupConsumption: []);
         var docs = Substitute.For<IDocumentationStore>();
-        docs.ListSlugs(Arg.Any<DocumentationKind>()).Returns(new HashSet<string>(StringComparer.Ordinal));
         docs.Read(DocumentationKind.User, "User:c").Returns(new DocumentationLookup("users/c.md", "# hello"));
         var service = new UserQueryService(StoreWith(graph), docs);
 
