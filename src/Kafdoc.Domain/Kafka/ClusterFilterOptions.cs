@@ -20,4 +20,11 @@ public sealed class ClusterFilterOptions
 
     /// <summary>Name prefixes of consumer groups to keep. Empty keeps all groups.</summary>
     public IReadOnlyList<string> GroupPrefixes { get; set; } = [];
+
+    /// <summary>
+    /// Principal names to exclude entirely, matched after the <c>User:</c> type
+    /// prefix is stripped (exact, ordinal). Their ACLs and SCRAM entries are
+    /// dropped, removing their nodes and edges from the graph. Empty excludes nobody.
+    /// </summary>
+    public IReadOnlyList<string> ExcludedUsers { get; set; } = [];
 }
