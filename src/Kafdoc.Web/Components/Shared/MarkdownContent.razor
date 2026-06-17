@@ -1,4 +1,5 @@
 @inject Markdig.MarkdownPipeline Pipeline
+@inject IJSRuntime JS
 
 <div class="documentation">
     @if (Markdown is null)
@@ -8,12 +9,15 @@
     }
     else
     {
-        <div class="doc-body">@((MarkupString)Markdig.Markdown.ToHtml(Markdown, Pipeline))</div>
+        <div class="doc-body" @ref="_docBody">@((MarkupString)Markdig.Markdown.ToHtml(Markdown, Pipeline))</div>
         <p class="doc-source">Source: <code>@Path</code></p>
     }
 </div>
 
 @code {
+    /// <summary>The rendered documentation body element, highlighted by Prism after each render.</summary>
+    private ElementReference _docBody;
+
     /// <summary>The raw markdown to render, or <c>null</c> when no file exists.</summary>
     [Parameter]
     public string? Markdown { get; set; }
@@ -22,4 +26,27 @@
     [Parameter]
     [EditorRequired]
     public string Path { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Re-applies Prism syntax highlighting to the rendered code blocks after every render so
+    /// highlighting survives InteractiveServer enhanced navigation. Highlighting is cosmetic, so a
+    /// failed Prism load is swallowed and the plain (escaped) code remains readable.
+    /// </summary>
+    /// <param name="firstRender">Whether this is the component's first render.</param>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Markdown is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("Prism.highlightAllUnder", _docBody);
+        }
+        catch (JSException)
+        {
+            // Highlighting is cosmetic; the escaped code is already readable without it.
+        }
+    }
 }
