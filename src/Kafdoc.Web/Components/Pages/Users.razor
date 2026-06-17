@@ -6,31 +6,75 @@
 
 <PageTitle>Users</PageTitle>
 
-<h1>Users</h1>
+<div class="kd-page">
+    <header class="kd-head">
+        <p class="kd-eyebrow">Kafka cluster</p>
+        <h1 class="kd-title">Users</h1>
+        <p class="kd-sub">Principals derived from ACLs and SCRAM credentials, and what they touch.</p>
+    </header>
 
-<RefreshStatus />
+    <RefreshStatus />
 
-@if (!Status.GetStatus().IsReady)
-{
-    <p><em>Loading cluster data…</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr><th>Principal</th><th>SCRAM</th><th>Produces</th><th>Consumes</th><th>Docs</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var u in UserQuery.GetUsers())
-            {
-                <tr>
-                    <td><a href="@($"/users/{Uri.EscapeDataString(u.Principal)}")">@u.Principal</a></td>
-                    <td>@(u.HasScramCredentials ? "yes" : "—")</td>
-                    <td>@u.ProducesCount</td>
-                    <td>@u.ConsumesCount</td>
-                    <td>@(u.HasDocumentation ? "✓" : "—")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    @if (!Status.GetStatus().IsReady)
+    {
+        <div class="kd-empty--block">Loading cluster data…</div>
+    }
+    else
+    {
+        var users = UserQuery.GetUsers().ToList();
+
+        <div class="kd-toolbar">
+            <span class="kd-count">@users.Count principal@(users.Count == 1 ? "" : "s")</span>
+        </div>
+
+        <div class="kd-table-wrap">
+            <table class="kd-table">
+                <thead>
+                    <tr>
+                        <th>Principal</th>
+                        <th class="kd-col-status">Auth</th>
+                        <th class="kd-num">Produces</th>
+                        <th class="kd-num">Consumes</th>
+                        <th class="kd-col-status">Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in users)
+                    {
+                        <tr>
+                            <td><a class="kd-id" href="@($"/users/{Uri.EscapeDataString(u.Principal)}")">@u.Principal</a></td>
+                            <td class="kd-col-status">
+                                @if (u.HasScramCredentials)
+                                {
+                                    <span class="kd-pill kd-pill--scram">SCRAM</span>
+                                }
+                                else
+                                {
+                                    <span class="kd-muted">—</span>
+                                }
+                            </td>
+                            <td class="kd-num @(u.ProducesCount == 0 ? "kd-num--zero" : null)">@u.ProducesCount</td>
+                            <td class="kd-num @(u.ConsumesCount == 0 ? "kd-num--zero" : null)">@u.ConsumesCount</td>
+                            <td class="kd-col-status">
+                                @if (u.HasDocumentation)
+                                {
+                                    <span class="kd-pill kd-pill--doc">Documented</span>
+                                }
+                                else
+                                {
+                                    <span class="kd-muted">—</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (users.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="kd-empty">No principals in the current snapshot.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -6,42 +6,70 @@
 
 <PageTitle>Topics</PageTitle>
 
-<h1>Topics</h1>
+<div class="kd-page">
+    <header class="kd-head">
+        <p class="kd-eyebrow">Kafka cluster</p>
+        <h1 class="kd-title">Topics</h1>
+        <p class="kd-sub">Producers, consumer groups, and docs for every topic in the snapshot.</p>
+    </header>
 
-<RefreshStatus />
+    <RefreshStatus />
 
-@if (!Status.GetStatus().IsReady)
-{
-    <p><em>Loading cluster data…</em></p>
-}
-else
-{
-    <input class="form-control mb-3" placeholder="Filter topics…" @bind="_filter" @bind:event="oninput" />
+    @if (!Status.GetStatus().IsReady)
+    {
+        <div class="kd-empty--block">Loading cluster data…</div>
+    }
+    else
+    {
+        var topics = Filtered().ToList();
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Topic</th>
-                <th>Partitions</th>
-                <th>Producers</th>
-                <th>Consumer groups</th>
-                <th>Docs</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var topic in Filtered())
-            {
-                <tr>
-                    <td><a href="@($"/topics/{Uri.EscapeDataString(topic.Name)}")">@topic.Name</a></td>
-                    <td>@topic.PartitionCount</td>
-                    <td>@topic.ProducerCount</td>
-                    <td>@topic.ConsumerGroupCount</td>
-                    <td>@(topic.HasDocumentation ? "✓" : "—")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        <div class="kd-toolbar">
+            <input class="kd-search" placeholder="Filter topics…" @bind="_filter" @bind:event="oninput" />
+            <span class="kd-count">@topics.Count of @TopicQuery.GetTopics().Count</span>
+        </div>
+
+        <div class="kd-table-wrap">
+            <table class="kd-table">
+                <thead>
+                    <tr>
+                        <th>Topic</th>
+                        <th class="kd-num">Partitions</th>
+                        <th class="kd-num">Producers</th>
+                        <th class="kd-num">Groups</th>
+                        <th class="kd-col-status">Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var topic in topics)
+                    {
+                        <tr>
+                            <td><a class="kd-id" href="@($"/topics/{Uri.EscapeDataString(topic.Name)}")">@topic.Name</a></td>
+                            <td class="kd-num">@topic.PartitionCount</td>
+                            <td class="kd-num @(topic.ProducerCount == 0 ? "kd-num--zero" : null)">@topic.ProducerCount</td>
+                            <td class="kd-num @(topic.ConsumerGroupCount == 0 ? "kd-num--zero" : null)">@topic.ConsumerGroupCount</td>
+                            <td class="kd-col-status">
+                                @if (topic.HasDocumentation)
+                                {
+                                    <span class="kd-pill kd-pill--doc">Documented</span>
+                                }
+                                else
+                                {
+                                    <span class="kd-muted">—</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (topics.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="kd-empty">No topics match “@_filter”.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
 
 @code {
     private string _filter = string.Empty;

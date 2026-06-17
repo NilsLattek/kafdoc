@@ -31,6 +31,6 @@ public sealed class UsersPageTests : Bunit.BunitContext
 
         // Assert
         Assert.Contains("href=\"/users/User%3Aalice\"", cut.Markup, StringComparison.Ordinal);
-        Assert.Contains("✓", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("Documented", cut.Markup, StringComparison.Ordinal);
     }
 }

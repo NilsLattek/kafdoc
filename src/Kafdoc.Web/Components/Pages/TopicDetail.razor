@@ -5,63 +5,126 @@
 
 <PageTitle>Topic: @Name</PageTitle>
 
-<p><a href="/">&larr; All topics</a></p>
+<div class="kd-page">
+    <a class="kd-back" href="/">&larr; All topics</a>
 
-@{
-    var detail = TopicQuery.GetTopic(Name);
-}
+    @{
+        var detail = TopicQuery.GetTopic(Name);
+    }
 
-@if (detail is null)
-{
-    <h1>Topic not found</h1>
-    <p>No topic named <code>@Name</code> in the current snapshot.</p>
-}
-else
-{
-    <h1>@detail.Name</h1>
-    <p>@detail.PartitionCount partition(s)</p>
-
-    <h2>Producers</h2>
-    @if (detail.Producers.Count == 0)
+    @if (detail is null)
     {
-        <p><em>No producers (no WRITE ACLs).</em></p>
+        <header class="kd-head">
+            <p class="kd-eyebrow">Topic</p>
+            <h1 class="kd-title">Not found</h1>
+        </header>
+        <div class="kd-empty--block">No topic named <code>@Name</code> in the current snapshot.</div>
     }
     else
     {
-        <ul>@foreach (var p in detail.Producers) { <li>@p</li> }</ul>
-    }
-
-    <h2>Consumer groups</h2>
-    @if (detail.ConsumerGroups.Count == 0)
-    {
-        <p><em>No consumer groups consuming this topic.</em></p>
-    }
-    else
-    {
-        <table class="table">
-            <thead><tr><th>Group</th><th>State</th><th>Principals</th></tr></thead>
-            <tbody>
-                @foreach (var g in detail.ConsumerGroups)
+        <header class="kd-head">
+            <p class="kd-eyebrow">Topic</p>
+            <h1 class="kd-title kd-title--mono">@detail.Name</h1>
+            <div class="kd-meta">
+                <span class="kd-chip"><b>@detail.PartitionCount</b> partitions</span>
+                <span class="kd-chip"><b>@detail.Producers.Count</b> producers</span>
+                <span class="kd-chip"><b>@detail.ConsumerGroups.Count</b> consumer groups</span>
+                @if (detail.Documentation is not null)
                 {
-                    <tr>
-                        <td>@g.GroupId</td>
-                        <td>@g.State</td>
-                        <td>@(g.Principals.Count == 0 ? "—" : string.Join(", ", g.Principals))</td>
-                    </tr>
+                    <span class="kd-chip"><span class="kd-pill kd-pill--doc">Documented</span></span>
                 }
-            </tbody>
-        </table>
-    }
+            </div>
+        </header>
 
-    @if (detail.ReadOnlyPrincipals.Count > 0)
-    {
-        <h2>Read-only principals (permitted, no active group)</h2>
-        <ul>@foreach (var p in detail.ReadOnlyPrincipals) { <li>@p</li> }</ul>
-    }
+        <div class="kd-flow">
+            <section class="kd-flow__panel kd-panel--write">
+                <div class="kd-panel__head">
+                    <h2>Producers</h2>
+                    <span class="kd-panel__dir">writes to →</span>
+                </div>
+                <div class="kd-panel__body">
+                    @if (detail.Producers.Count == 0)
+                    {
+                        <p class="kd-empty">No producers — no WRITE ACLs.</p>
+                    }
+                    else
+                    {
+                        <ul class="kd-list">
+                            @foreach (var p in detail.Producers)
+                            {
+                                <li><a href="@($"/users/{Uri.EscapeDataString(p)}")">@p</a></li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </section>
 
-    <h2>Documentation</h2>
-    <MarkdownContent Markdown="@detail.Documentation" Path="@detail.DocumentationPath" />
-}
+            <div class="kd-flow__arrow" aria-hidden="true">→</div>
+
+            <div class="kd-flow__node">
+                <div class="kd-flow__node-label">Topic</div>
+                <div class="kd-flow__node-name">@detail.Name</div>
+                <div class="kd-flow__node-meta">@detail.PartitionCount partition@(detail.PartitionCount == 1 ? "" : "s")</div>
+            </div>
+
+            <div class="kd-flow__arrow" aria-hidden="true">→</div>
+
+            <section class="kd-flow__panel kd-panel--read">
+                <div class="kd-panel__head">
+                    <h2>Consumer groups</h2>
+                    <span class="kd-panel__dir">→ reads from</span>
+                </div>
+                <div class="kd-panel__body">
+                    @if (detail.ConsumerGroups.Count == 0)
+                    {
+                        <p class="kd-empty">No consumer groups consuming this topic.</p>
+                    }
+                    else
+                    {
+                        @foreach (var g in detail.ConsumerGroups)
+                        {
+                            <div class="kd-group">
+                                <div class="kd-group__id">
+                                    @g.GroupId
+                                    <span class="kd-pill kd-pill--state">@g.State</span>
+                                </div>
+                                <p class="kd-group__principals">
+                                    @if (g.Principals.Count == 0)
+                                    {
+                                        <span>no bound principals</span>
+                                    }
+                                    else
+                                    {
+                                        for (var i = 0; i < g.Principals.Count; i++)
+                                        {
+                                            var principal = g.Principals[i];
+                                            <a href="@($"/users/{Uri.EscapeDataString(principal)}")">@principal</a>
+                                            @(i < g.Principals.Count - 1 ? ", " : "")
+                                        }
+                                    }
+                                </p>
+                            </div>
+                        }
+                    }
+                </div>
+            </section>
+        </div>
+
+        @if (detail.ReadOnlyPrincipals.Count > 0)
+        {
+            <h2 class="kd-section-label">Permitted readers · no active group</h2>
+            <div class="kd-tags">
+                @foreach (var p in detail.ReadOnlyPrincipals)
+                {
+                    <a class="kd-tag" href="@($"/users/{Uri.EscapeDataString(p)}")">@p</a>
+                }
+            </div>
+        }
+
+        <h2 class="kd-section-label">Documentation</h2>
+        <MarkdownContent Markdown="@detail.Documentation" Path="@detail.DocumentationPath" />
+    }
+</div>
 
 @code {
     /// <summary>The topic name from the route.</summary>

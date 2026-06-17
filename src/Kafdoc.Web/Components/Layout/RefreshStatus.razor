@@ -4,14 +4,15 @@
 @inject ISnapshotStatusService Status
 @inject IServiceScopeFactory ScopeFactory
 
-<div class="alert alert-light d-flex justify-content-between align-items-center" role="status">
+@{
+    var status = Status.GetStatus();
+}
+<div class="kd-status" role="status">
     <span>
-        @{
-            var status = Status.GetStatus();
-        }
+        <span class="kd-status__dot @(status.LastError is null ? null : "kd-status__dot--err")" aria-hidden="true"></span>
         @if (status.LastRefresh is { } when)
         {
-            <span>Last refreshed: @when.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss")</span>
+            <span>Last refreshed <time>@when.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss")</time></span>
         }
         else
         {
@@ -19,10 +20,10 @@
         }
         @if (status.LastError is { } error)
         {
-            <span class="text-danger ms-2">⚠ Last refresh failed: @error</span>
+            <span class="kd-status__err">⚠ Last refresh failed: @error</span>
         }
     </span>
-    <button class="btn btn-sm btn-outline-primary" @onclick="RefreshNow" disabled="@_refreshing">
+    <button class="kd-btn" @onclick="RefreshNow" disabled="@_refreshing">
         @(_refreshing ? "Refreshing…" : "Refresh now")
     </button>
 </div>
