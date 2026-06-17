@@ -58,7 +58,8 @@ public sealed class UserDetailPageTests : Bunit.BunitContext
         var cut = Render<UserDetail>(ps => ps.Add(p => p.Principal, "User:ghost"));
 
         // Assert
-        Assert.Contains("User not found", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("Not found", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("User:ghost", cut.Markup, StringComparison.Ordinal);
     }
 
     [Fact]

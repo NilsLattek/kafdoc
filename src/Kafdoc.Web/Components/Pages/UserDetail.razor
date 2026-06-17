@@ -5,55 +5,102 @@
 
 <PageTitle>User: @Principal</PageTitle>
 
-<p><a href="/users">&larr; All users</a></p>
+<div class="kd-page">
+    <a class="kd-back" href="/users">&larr; All users</a>
 
-@{
-    var detail = UserQuery.GetUser(Principal);
-}
+    @{
+        var detail = UserQuery.GetUser(Principal);
+    }
 
-@if (detail is null)
-{
-    <h1>User not found</h1>
-    <p>No principal named <code>@Principal</code> in the current snapshot.</p>
-}
-else
-{
-    <h1>@detail.Principal</h1>
-    <p>SCRAM: @(detail.HasScramCredentials ? "yes" : "—")</p>
-
-    <h2>Produces</h2>
-    @if (detail.ProducesTopics.Count == 0)
+    @if (detail is null)
     {
-        <p><em>No producer ACLs.</em></p>
+        <header class="kd-head">
+            <p class="kd-eyebrow">User</p>
+            <h1 class="kd-title">Not found</h1>
+        </header>
+        <div class="kd-empty--block">No principal named <code>@Principal</code> in the current snapshot.</div>
     }
     else
     {
-        <ul>
-            @foreach (var topic in detail.ProducesTopics)
-            {
-                <li><a href="@($"/topics/{Uri.EscapeDataString(topic)}")">@topic</a></li>
-            }
-        </ul>
-    }
+        <header class="kd-head">
+            <p class="kd-eyebrow">User</p>
+            <h1 class="kd-title kd-title--mono">@detail.Principal</h1>
+            <div class="kd-meta">
+                @if (detail.HasScramCredentials)
+                {
+                    <span class="kd-chip"><span class="kd-pill kd-pill--scram">SCRAM</span></span>
+                }
+                else
+                {
+                    <span class="kd-chip">No SCRAM credentials</span>
+                }
+                <span class="kd-chip"><b>@detail.ProducesTopics.Count</b> produces</span>
+                <span class="kd-chip"><b>@detail.ConsumesTopics.Count</b> consumes</span>
+                <span class="kd-chip"><b>@detail.Groups.Count</b> groups</span>
+            </div>
+        </header>
 
-    <h2>Consumes</h2>
-    @if (detail.ConsumesTopics.Count == 0)
-    {
-        <p><em>No consumer ACLs.</em></p>
-    }
-    else
-    {
-        <ul>
-            @foreach (var topic in detail.ConsumesTopics)
-            {
-                <li><a href="@($"/topics/{Uri.EscapeDataString(topic)}")">@topic</a></li>
-            }
-        </ul>
-    }
+        <div class="kd-cols">
+            <section class="kd-card kd-panel--write">
+                <div class="kd-panel__head">
+                    <h2>Produces to</h2>
+                    <span class="kd-panel__dir">writes →</span>
+                </div>
+                <div class="kd-panel__body">
+                    @if (detail.ProducesTopics.Count == 0)
+                    {
+                        <p class="kd-empty">No producer ACLs.</p>
+                    }
+                    else
+                    {
+                        <ul class="kd-list">
+                            @foreach (var topic in detail.ProducesTopics)
+                            {
+                                <li><a href="@($"/topics/{Uri.EscapeDataString(topic)}")">@topic</a></li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </section>
 
-    <h2>Documentation</h2>
-    <MarkdownContent Markdown="@detail.Documentation" Path="@detail.DocumentationPath" />
-}
+            <section class="kd-card kd-panel--read">
+                <div class="kd-panel__head">
+                    <h2>Consumes from</h2>
+                    <span class="kd-panel__dir">← reads</span>
+                </div>
+                <div class="kd-panel__body">
+                    @if (detail.ConsumesTopics.Count == 0)
+                    {
+                        <p class="kd-empty">No consumer ACLs.</p>
+                    }
+                    else
+                    {
+                        <ul class="kd-list">
+                            @foreach (var topic in detail.ConsumesTopics)
+                            {
+                                <li><a href="@($"/topics/{Uri.EscapeDataString(topic)}")">@topic</a></li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </section>
+        </div>
+
+        @if (detail.Groups.Count > 0)
+        {
+            <h2 class="kd-section-label">Consumer groups</h2>
+            <div class="kd-tags">
+                @foreach (var group in detail.Groups)
+                {
+                    <span class="kd-tag">@group</span>
+                }
+            </div>
+        }
+
+        <h2 class="kd-section-label">Documentation</h2>
+        <MarkdownContent Markdown="@detail.Documentation" Path="@detail.DocumentationPath" />
+    }
+</div>
 
 @code {
     /// <summary>The principal from the route.</summary>

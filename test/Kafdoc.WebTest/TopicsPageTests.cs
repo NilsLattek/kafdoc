@@ -50,6 +50,6 @@ public sealed class TopicsPageTests : Bunit.BunitContext
         // Assert
         Assert.Contains("orders", cut.Markup, StringComparison.Ordinal);
         Assert.Contains("billing", cut.Markup, StringComparison.Ordinal);
-        Assert.Contains("✓", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("Documented", cut.Markup, StringComparison.Ordinal);
     }
 }
