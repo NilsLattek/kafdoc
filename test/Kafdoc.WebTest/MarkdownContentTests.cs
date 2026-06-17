@@ -10,8 +10,11 @@ namespace Kafdoc.WebTest;
 
 public sealed class MarkdownContentTests : Bunit.BunitContext
 {
-    private void RegisterPipeline() =>
+    private void RegisterPipeline()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         Services.AddSingleton(new MarkdownPipelineBuilder().UseAdvancedExtensions().UseYamlFrontMatter().DisableHtml().Build());
+    }
 
     [Fact]
     public void Renders_markdown_as_html_with_a_source_caption()
@@ -77,5 +80,36 @@ public sealed class MarkdownContentTests : Bunit.BunitContext
         Assert.DoesNotContain("orders.*.placed", cut.Markup, StringComparison.Ordinal);
         Assert.Contains("<h1", cut.Markup, StringComparison.Ordinal);
         Assert.Contains("Orders placed", cut.Markup, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Highlights_rendered_markdown_via_prism_after_render()
+    {
+        // Arrange
+        RegisterPipeline();
+
+        // Act
+        var cut = Render<MarkdownContent>(ps => ps
+            .Add(p => p.Markdown, "```json\n{ \"id\": 42 }\n```")
+            .Add(p => p.Path, "topics/orders.md"));
+
+        // Assert — the language class is emitted and Prism was triggered once on the rendered body
+        Assert.Contains("language-json", cut.Markup, StringComparison.Ordinal);
+        Assert.Single(JSInterop.Invocations, i => string.Equals(i.Identifier, "Prism.highlightAllUnder", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Does_not_trigger_prism_when_no_markdown_is_present()
+    {
+        // Arrange
+        RegisterPipeline();
+
+        // Act
+        _ = Render<MarkdownContent>(ps => ps
+            .Add(p => p.Markdown, (string?)null)
+            .Add(p => p.Path, "users/svc-payments.md"));
+
+        // Assert — the empty-state branch renders no code body, so Prism is never invoked
+        Assert.DoesNotContain(JSInterop.Invocations, i => string.Equals(i.Identifier, "Prism.highlightAllUnder", StringComparison.Ordinal));
     }
 }

@@ -14,8 +14,11 @@ namespace Kafdoc.WebTest;
 
 public sealed class UserDetailPageTests : Bunit.BunitContext
 {
-    private void RegisterPipeline() =>
+    private void RegisterPipeline()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         Services.AddSingleton(new MarkdownPipelineBuilder().UseAdvancedExtensions().DisableHtml().Build());
+    }
 
     [Fact]
     public void UserDetail_renders_produce_and_consume_topic_links_for_a_known_principal()
