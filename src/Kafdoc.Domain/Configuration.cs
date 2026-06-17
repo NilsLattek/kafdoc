@@ -19,7 +19,15 @@ public static class Configuration
     public static void ConfigureDomain(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<ClusterFilterOptions>()
-            .Bind(configuration.GetSection(ClusterFilterOptions.SectionName));
+            .Bind(configuration.GetSection(ClusterFilterOptions.SectionName))
+            .PostConfigure(options =>
+            {
+                var saslUsername = configuration["Kafka:SaslUsername"];
+                if (!string.IsNullOrWhiteSpace(saslUsername))
+                {
+                    options.ExcludedUsers = [.. options.ExcludedUsers, saslUsername];
+                }
+            });
         services.AddSingleton(sp => sp.GetRequiredService<IOptions<ClusterFilterOptions>>().Value);
 
         services.AddSingleton<RawClusterDataFilter>();

@@ -208,6 +208,68 @@ public class RawClusterDataFilterTests
     }
 
     [Fact]
+    public void Apply_drops_acls_of_an_excluded_user()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions { ExcludedUsers = ["kafdoc-admin"] });
+        var raw = Raw(acls: [Acl("User:kafdoc-admin", "qa.orders"), Acl("User:qa-svc", "qa.orders")]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        Assert.DoesNotContain(result.Acls, a => string.Equals(a.Principal, "User:kafdoc-admin", StringComparison.Ordinal));
+        Assert.Contains(result.Acls, a => string.Equals(a.Principal, "User:qa-svc", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Apply_drops_scram_entry_of_an_excluded_user()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions { ExcludedUsers = ["kafdoc-admin"] });
+        var raw = Raw(scram: [new RawScramUser("User:kafdoc-admin"), new RawScramUser("User:qa-svc")]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        Assert.DoesNotContain(result.ScramUsers, u => string.Equals(u.Principal, "User:kafdoc-admin", StringComparison.Ordinal));
+        Assert.Contains(result.ScramUsers, u => string.Equals(u.Principal, "User:qa-svc", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Apply_excludes_user_by_exact_name_not_prefix()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions { ExcludedUsers = ["admin"] });
+        var raw = Raw(scram: [new RawScramUser("User:admin"), new RawScramUser("User:admin-readonly")]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        Assert.DoesNotContain(result.ScramUsers, u => string.Equals(u.Principal, "User:admin", StringComparison.Ordinal));
+        Assert.Contains(result.ScramUsers, u => string.Equals(u.Principal, "User:admin-readonly", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Apply_with_empty_excluded_users_keeps_everyone()
+    {
+        // Arrange
+        var filter = new RawClusterDataFilter(new ClusterFilterOptions());
+        var raw = Raw(
+            acls: [Acl("User:kafdoc-admin", "qa.orders")],
+            scram: [new RawScramUser("User:kafdoc-admin")]);
+
+        // Act
+        var result = filter.Apply(raw);
+
+        // Assert
+        Assert.Single(result.Acls);
+        Assert.Single(result.ScramUsers);
+    }
+
+    [Fact]
     public void Filtered_acl_referencing_a_dropped_topic_yields_no_edge()
     {
         // Arrange

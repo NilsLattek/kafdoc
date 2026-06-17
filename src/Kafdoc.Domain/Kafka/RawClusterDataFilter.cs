@@ -5,7 +5,7 @@ namespace Kafdoc.Domain.Kafka;
 /// only resources whose names match the configured prefixes. Pure and deterministic:
 /// it performs no I/O and depends only on its input and options.
 /// </summary>
-/// <param name="options">The prefix allow-lists per resource type.</param>
+/// <param name="options">The prefix allow-lists and user exclusion deny-list per resource type.</param>
 public sealed class RawClusterDataFilter(ClusterFilterOptions options)
 {
     private const string PrincipalTypePrefix = "User:";
@@ -26,11 +26,11 @@ public sealed class RawClusterDataFilter(ClusterFilterOptions options)
             .ToList();
 
         var acls = raw.Acls
-            .Where(a => Matches(PrincipalName(a.Principal), options.UserPrefixes))
+            .Where(a => Matches(PrincipalName(a.Principal), options.UserPrefixes) && !IsExcluded(a.Principal))
             .ToList();
 
         var scramUsers = raw.ScramUsers
-            .Where(u => Matches(PrincipalName(u.Principal), options.UserPrefixes))
+            .Where(u => Matches(PrincipalName(u.Principal), options.UserPrefixes) && !IsExcluded(u.Principal))
             .ToList();
 
         var groups = raw.ConsumerGroups
@@ -54,4 +54,7 @@ public sealed class RawClusterDataFilter(ClusterFilterOptions options)
         principal.StartsWith(PrincipalTypePrefix, StringComparison.Ordinal)
             ? principal[PrincipalTypePrefix.Length..]
             : principal;
+
+    private bool IsExcluded(string principal) =>
+        options.ExcludedUsers.Contains(PrincipalName(principal), StringComparer.Ordinal);
 }
