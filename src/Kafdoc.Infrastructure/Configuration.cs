@@ -42,6 +42,7 @@ public static class Configuration
         services.AddOptions<DocumentationOptions>()
             .Bind(configuration.GetSection(DocumentationOptions.SectionName));
         services.AddSingleton<IDocumentationStore, FileDocumentationStore>();
+        services.AddSingleton<IIntroductionSource, FileIntroductionSource>();
 
         services.AddSingleton<IKafkaClusterReader, ConfluentKafkaClusterReader>();
     }

@@ -25,6 +25,7 @@ public static class Configuration
         services.AddSingleton<Services.ITopicQueryService, Services.TopicQueryService>();
         services.AddSingleton<Services.IUserQueryService, Services.UserQueryService>();
         services.AddSingleton<Services.ISnapshotStatusService, Services.SnapshotStatusService>();
+        services.AddSingleton<Services.IIntroductionQueryService, Services.IntroductionQueryService>();
 
         services.AddHostedService<Snapshot.ClusterRefreshHostedService>();
     }
