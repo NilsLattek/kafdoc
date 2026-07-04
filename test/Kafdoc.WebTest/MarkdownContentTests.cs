@@ -112,4 +112,22 @@ public sealed class MarkdownContentTests : Bunit.BunitContext
         // Assert — the empty-state branch renders no code body, so Prism is never invoked
         Assert.DoesNotContain(JSInterop.Invocations, i => string.Equals(i.Identifier, "Prism.highlightAllUnder", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void Hides_source_caption_when_ShowSource_is_false()
+    {
+        // Arrange
+        RegisterPipeline();
+
+        // Act
+        var cut = Render<MarkdownContent>(ps => ps
+            .Add(p => p.Markdown, "# Hello")
+            .Add(p => p.Path, "index.md")
+            .Add(p => p.ShowSource, false));
+
+        // Assert
+        Assert.DoesNotContain("doc-source", cut.Markup, StringComparison.Ordinal);
+        Assert.DoesNotContain("Source:", cut.Markup, StringComparison.Ordinal);
+        Assert.Contains("Hello", cut.Markup, StringComparison.Ordinal);
+    }
 }

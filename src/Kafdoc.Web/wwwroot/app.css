@@ -321,6 +321,10 @@ main {
     color: var(--kd-ink-3);
 }
 
+.kd-intro {
+    margin: 0.35rem 0 0.9rem;
+}
+
 .kd-title {
     margin: 0;
     font-size: 1.5rem;

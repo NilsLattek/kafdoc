@@ -10,7 +10,10 @@
     else
     {
         <div class="doc-body" @ref="_docBody">@((MarkupString)Markdig.Markdown.ToHtml(Markdown, Pipeline))</div>
-        <p class="doc-source">Source: <code>@Path</code></p>
+        @if (ShowSource)
+        {
+            <p class="doc-source">Source: <code>@Path</code></p>
+        }
     }
 </div>
 
@@ -26,6 +29,10 @@
     [Parameter]
     [EditorRequired]
     public string Path { get; set; } = string.Empty;
+
+    /// <summary>Whether to show the "Source: &lt;path&gt;" footer. Default <c>true</c>.</summary>
+    [Parameter]
+    public bool ShowSource { get; set; } = true;
 
     /// <summary>
     /// Re-applies Prism syntax highlighting to the rendered code blocks after every render so
