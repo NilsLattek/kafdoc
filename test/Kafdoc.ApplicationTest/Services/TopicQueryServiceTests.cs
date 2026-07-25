@@ -91,7 +91,7 @@ public class TopicQueryServiceTests
 
         // Assert
         Assert.NotNull(detail);
-        Assert.Equal(["User:p"], detail!.Producers);
+        Assert.Equal(["User:p"], detail.Producers);
         var group = Assert.Single(detail.ConsumerGroups);
         Assert.Equal("g1", group.GroupId);
         Assert.Equal(["User:c"], group.Principals);
@@ -134,7 +134,7 @@ public class TopicQueryServiceTests
 
         // Assert
         Assert.NotNull(detail);
-        Assert.Equal("topics/orders.placed.md", detail!.DocumentationPath);
+        Assert.Equal("topics/orders.placed.md", detail.DocumentationPath);
         Assert.Equal("# Orders", detail.Documentation);
     }
 }

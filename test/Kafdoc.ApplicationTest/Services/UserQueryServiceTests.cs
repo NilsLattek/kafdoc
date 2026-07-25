@@ -97,7 +97,7 @@ public class UserQueryServiceTests
 
         // Assert
         Assert.NotNull(detail);
-        Assert.Empty(detail!.ProducesTopics);
+        Assert.Empty(detail.ProducesTopics);
         Assert.Equal(["orders"], detail.ConsumesTopics);
         Assert.Equal(["g1"], detail.Groups);
     }
@@ -139,7 +139,7 @@ public class UserQueryServiceTests
 
         // Assert
         Assert.NotNull(detail);
-        Assert.Equal("users/c.md", detail!.DocumentationPath);
+        Assert.Equal("users/c.md", detail.DocumentationPath);
         Assert.Equal("# hello", detail.Documentation);
     }
 }
