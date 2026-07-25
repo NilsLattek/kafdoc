@@ -29,7 +29,7 @@ public class ClusterRefreshServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(store.Current);
-        Assert.Equal(time.GetUtcNow(), store.Current!.CapturedAt);
+        Assert.Equal(time.GetUtcNow(), store.Current.CapturedAt);
     }
 
     [Fact]
