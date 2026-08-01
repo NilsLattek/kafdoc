@@ -5,12 +5,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AngleSharp" Version="1.5.2" />
-    <PackageVersion Include="bunit" Version="2.7.2" />
+    <PackageVersion Include="bunit" Version="2.8.6" />
     <PackageVersion Include="Confluent.Kafka" Version="2.15.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="FluentResults" Version="4.0.0" />
     <PackageVersion Include="Markdig" Version="0.45.0" />
-    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.125" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.138" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
@@ -22,7 +22,7 @@
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
     <PackageVersion Include="Riok.Mapperly" Version="4.3.1" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.15.0" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.30.0.144632" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.31.0.145097" />
     <PackageVersion Include="Testcontainers" Version="4.13.0" />
     <PackageVersion Include="Testcontainers.XunitV3" Version="4.13.0" />
     <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.3" />
