@@ -412,6 +412,7 @@ dotnet_diagnostic.IDE0055.severity = none # Fix formatting
 
 [test/**/*.cs]
 dotnet_diagnostic.CA1707.severity = none # Identifiers should not contain underscores
+dotnet_diagnostic.MA0002.severity = none # Use an overload that has a IEqualityComparer<string> or IComparer<string> parameter
 
 # Verify settings
 [*.{received,verified}.{json,txt,xml}]
