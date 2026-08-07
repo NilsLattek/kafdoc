@@ -4,7 +4,7 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="bunit" Version="2.9.0" />
+    <PackageVersion Include="bunit" Version="2.8.6" />
     <PackageVersion Include="Confluent.Kafka" Version="2.15.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="FluentResults" Version="4.0.0" />
