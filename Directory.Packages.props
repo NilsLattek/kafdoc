@@ -4,12 +4,12 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="bunit" Version="2.10.3" />
+    <PackageVersion Include="bunit" Version="2.11.3" />
     <PackageVersion Include="Confluent.Kafka" Version="2.15.1" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="FluentResults" Version="4.0.0" />
     <PackageVersion Include="Markdig" Version="0.45.0" />
-    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.253" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.262" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
